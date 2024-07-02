@@ -20,6 +20,12 @@ add_executable(checkers_client main.cpp
         login_screen.h
         lobby.cpp
         lobby.h
+        socket.cpp
+        socket.h
+        application_window.cpp
+        application_window.h
+        player_info.cpp
+        player_info.h
 )
 target_link_libraries(checkers_client
         Qt::Core

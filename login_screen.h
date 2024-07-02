@@ -9,10 +9,18 @@
 #include <QTcpSocket>
 #include <memory>
 #include <vector>
+#include "socket.h"
+#include "application_window.h"
+#include "player_info.h"
 
-class LoginScreen : public QMainWindow {
+class Lobby;
+
+class LoginScreen : public ApplicationWindow {
 public:
-    LoginScreen();
+    LoginScreen(Socket& socket, PlayerInfo& player);
+    void SetLobby(Lobby* lobby);
+    void DrawWindow();
+    void EraseWindow();
 
 private:
     void Request(const std::string&);
@@ -21,20 +29,15 @@ private:
     void Login();
     void Register();
     void ClearBoxes();
-    void OpenLobby();
-    void SetLobby(QMainWindow* lobby);
 
-    QHostAddress serverAddress_;
-    int serverPort_ = 8080;
-    QTcpSocket* socket_;
+    QLineEdit* loginBox_ = nullptr;
+    QLineEdit* passwordBox_ = nullptr;
+    QLabel* connectLabel_ = nullptr;
+    QLabel* headerLabel_ = nullptr;
+    QPushButton* swapButton_ = nullptr;
+    QPushButton* activeButton_ = nullptr;
 
-    int screenWidth_;
-    QLineEdit* loginBox_;
-    QLineEdit* passwordBox_;
-    QLabel* connectLabel_;
-    QLabel* headerLabel_;
-    QPushButton* swapButton_;
-    QPushButton* activeButton_;
-
-    QMainWindow* lobby_ = nullptr;
+    Socket& socket_;
+    PlayerInfo& player_;
+    Lobby* lobby_ = nullptr;
 };

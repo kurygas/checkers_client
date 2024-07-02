@@ -1,12 +1,62 @@
 #include "login_screen.h"
 
-LoginScreen::LoginScreen()
-: QMainWindow()
-, serverAddress_(QHostAddress::LocalHost) {
-    auto screen = QApplication::primaryScreen();
-    screenWidth_ = screen->geometry().width();
-    setWindowState(Qt::WindowMaximized);
+LoginScreen::LoginScreen(Socket& socket, PlayerInfo& player)
+: socket_(socket)
+, player_(player) {
+    DrawWindow();
+}
 
+void LoginScreen::OpenLogin() {
+    headerLabel_->setText("Checkers Online");
+    activeButton_->setText("Log in");
+    connect(activeButton_, &QPushButton::pressed, this, &LoginScreen::Login);
+    swapButton_->setText("Register");
+    connect(swapButton_, &QPushButton::pressed, this, &LoginScreen::OpenRegistration);
+    connectLabel_->hide();
+    ClearBoxes();
+}
+
+void LoginScreen::OpenRegistration() {
+    headerLabel_->setText("Registration");
+    activeButton_->setText("Register");
+    connect(activeButton_, &QPushButton::pressed, this, &LoginScreen::Register);
+    swapButton_->setText("Back");
+    connect(swapButton_, &QPushButton::pressed, this, &LoginScreen::OpenLogin);
+    connectLabel_->hide();
+    ClearBoxes();
+}
+
+void LoginScreen::Request(const std::string& type) {
+    socket_.Write((type + '$' + loginBox_->text().toStdString() + '$' + passwordBox_->text().toStdString()));
+    connectLabel_->show();
+    connectLabel_->setText(socket_.Read().c_str());
+
+    if (connectLabel_->text() != "Success") {
+        connectLabel_->setStyleSheet("QLabel {color: red;}");
+    }
+    else {
+        EraseWindow();
+    }
+}
+
+void LoginScreen::Login() {
+    Request("login");
+}
+
+void LoginScreen::Register() {
+    Request("register");
+}
+
+void LoginScreen::ClearBoxes() {
+    loginBox_->setText("");
+    passwordBox_->setText("");
+}
+
+void LoginScreen::SetLobby(Lobby* lobby) {
+    lobby_ = lobby;
+}
+
+void LoginScreen::DrawWindow() {
     headerLabel_ = new QLabel(this);
     headerLabel_->setFont(QFont("Arial", 50));
     headerLabel_->setGeometry(0, 0, screenWidth_, 250);
@@ -33,69 +83,15 @@ LoginScreen::LoginScreen()
 
     OpenLogin();
     show();
-
-    socket_ = new QTcpSocket();
-    socket_->connectToHost(serverAddress_, serverPort_);
-    socket_->waitForConnected();
 }
 
-void LoginScreen::OpenLogin() {
-    headerLabel_->setText("Checkers Online");
-    activeButton_->setText("Log in");
-    connect(activeButton_, &QPushButton::pressed, this, &LoginScreen::Login);
-    swapButton_->setText("Register");
-    connect(swapButton_, &QPushButton::pressed, this, &LoginScreen::OpenRegistration);
-    connectLabel_->hide();
-    ClearBoxes();
-}
+void LoginScreen::EraseWindow() {
+    delete headerLabel_;
+    delete loginBox_;
+    delete passwordBox_;
+    delete activeButton_;
+    delete connectLabel_;
+    delete swapButton_;
 
-void LoginScreen::OpenRegistration() {
-    headerLabel_->setText("Registration");
-    activeButton_->setText("Register");
-    connect(activeButton_, &QPushButton::pressed, this, &LoginScreen::Register);
-    swapButton_->setText("Back");
-    connect(swapButton_, &QPushButton::pressed, this, &LoginScreen::OpenLogin);
-    connectLabel_->hide();
-    ClearBoxes();
-}
-
-void LoginScreen::Request(const std::string& type) {
-    socket_->write((type + '$' + loginBox_->text().toStdString() + '$' + passwordBox_->text().toStdString()).c_str());
-    connectLabel_->show();
-
-    if (socket_->waitForBytesWritten() && socket_->waitForReadyRead()) {
-        connectLabel_->setText(socket_->readAll().toStdString().c_str());
-    }
-    else {
-        connectLabel_->setText("ConnectionLost");
-    }
-
-    if (connectLabel_->text() == "Success") {
-        connectLabel_->setStyleSheet("QLabel {color: green;}");
-    }
-    else {
-        connectLabel_->setStyleSheet("QLabel {color: red;}");
-    }
-}
-
-void LoginScreen::Login() {
-    Request("login");
-}
-
-void LoginScreen::Register() {
-    Request("register");
-}
-
-void LoginScreen::ClearBoxes() {
-    loginBox_->setText("");
-    passwordBox_->setText("");
-}
-
-void LoginScreen::OpenLobby() {
-    lobby_->show();
     hide();
-}
-
-void LoginScreen::SetLobby(QMainWindow* lobby) {
-    lobby_ = lobby;
 }
