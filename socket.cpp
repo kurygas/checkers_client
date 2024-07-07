@@ -4,9 +4,6 @@ char* ConnectionError::what() const noexcept {
     return strdup("Connection lost");
 }
 
-Socket::Socket(QApplication* app)
-: QTcpSocket(app) {}
-
 void Socket::ConnectToServer() {
     connectToHost(QHostAddress::LocalHost, 8080);
 
@@ -14,11 +11,11 @@ void Socket::ConnectToServer() {
         ConnectionLost();
     }
 
-    connect(this, &QTcpSocket::disconnected, this, &Socket::ConnectionLost);
+    connectionLostCall_ = connect(this, &QTcpSocket::disconnected, this, &Socket::ConnectionLost);
 }
 
-void Socket::Write(const std::string& data) {
-    write(data.c_str());
+void Socket::Write(const QString& data) {
+    write(data.toUtf8());
 
     if (!QAbstractSocket::waitForBytesWritten()) {
         ConnectionLost();
@@ -35,5 +32,9 @@ std::string Socket::Read() {
 
 void Socket::ConnectionLost() {
     QMessageBox::critical(nullptr, "Error", "Connection lost!");
-    exit(0);
+    throw ConnectionError();
+}
+
+void Socket::PrepareForClose() {
+    disconnect(connectionLostCall_);
 }

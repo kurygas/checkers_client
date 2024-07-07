@@ -2,9 +2,8 @@
 #include <QTcpSocket>
 #include <QApplication>
 #include <QMessageBox>
-#include <string>
+#include <QMetaObject>
 #include <exception>
-#include <memory>
 
 class ConnectionError: public std::exception {
 public:
@@ -13,9 +12,12 @@ public:
 
 class Socket : public QTcpSocket {
 public:
-    explicit Socket(QApplication* app);
     void ConnectToServer();
-    void Write(const std::string& data);
+    void Write(const QString& data);
     std::string Read();
+    void PrepareForClose();
     static void ConnectionLost();
+
+private:
+    QMetaObject::Connection connectionLostCall_;
 };

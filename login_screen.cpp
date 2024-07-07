@@ -1,10 +1,7 @@
 #include "login_screen.h"
 
 LoginScreen::LoginScreen(Socket& socket, PlayerInfo& player)
-: socket_(socket)
-, player_(player) {
-    DrawWindow();
-}
+: ApplicationWindow(socket, player) {}
 
 void LoginScreen::OpenLogin() {
     headerLabel_->setText("Checkers Online");
@@ -26,8 +23,8 @@ void LoginScreen::OpenRegistration() {
     ClearBoxes();
 }
 
-void LoginScreen::Request(const std::string& type) {
-    socket_.Write((type + '$' + loginBox_->text().toStdString() + '$' + passwordBox_->text().toStdString()));
+void LoginScreen::Request(const QString& type) {
+    socket_.Write(type + '$' + loginBox_->text() + '$' + passwordBox_->text());
     connectLabel_->show();
     connectLabel_->setText(socket_.Read().c_str());
 
@@ -36,6 +33,7 @@ void LoginScreen::Request(const std::string& type) {
     }
     else {
         EraseWindow();
+        lobby_->DrawWindow();
     }
 }
 
@@ -52,7 +50,7 @@ void LoginScreen::ClearBoxes() {
     passwordBox_->setText("");
 }
 
-void LoginScreen::SetLobby(Lobby* lobby) {
+void LoginScreen::SetLobby(ApplicationWindow* lobby) {
     lobby_ = lobby;
 }
 

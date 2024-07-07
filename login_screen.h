@@ -6,24 +6,17 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QDebug>
-#include <QTcpSocket>
-#include <memory>
-#include <vector>
-#include "socket.h"
 #include "application_window.h"
-#include "player_info.h"
-
-class Lobby;
 
 class LoginScreen : public ApplicationWindow {
 public:
     LoginScreen(Socket& socket, PlayerInfo& player);
-    void SetLobby(Lobby* lobby);
-    void DrawWindow();
-    void EraseWindow();
+    void SetLobby(ApplicationWindow* lobby);
+    void DrawWindow() override;
+    void EraseWindow() override;
 
 private:
-    void Request(const std::string&);
+    void Request(const QString&);
     void OpenRegistration();
     void OpenLogin();
     void Login();
@@ -37,7 +30,5 @@ private:
     QPushButton* swapButton_ = nullptr;
     QPushButton* activeButton_ = nullptr;
 
-    Socket& socket_;
-    PlayerInfo& player_;
-    Lobby* lobby_ = nullptr;
+    ApplicationWindow* lobby_ = nullptr;
 };
