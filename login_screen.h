@@ -10,22 +10,29 @@
 
 class LoginScreen : public ApplicationWindow {
 public:
-    LoginScreen(Socket& socket, PlayerInfo& player);
-    void SetLobby(ApplicationWindow* lobby);
-    void DrawWindow() override;
-    void EraseWindow() override;
+    LoginScreen(Socket* socket, PlayerInfo& player);
+    void SetLobbyScreen(ApplicationWindow* lobby);
 
 private:
-    void Request(const QString&);
+    void Draw() override;
     void OpenRegistration();
     void OpenLogin();
-    void Login();
-    void Register();
     void ClearBoxes();
+    void ShowError();
+    void ShowWaitMessage();
+    void ShowSuccess();
+    bool CheckBoxesInfo();
+    void EnableButtons();
+
+    void ProcessMessage(const QList<QString>& message) override;
+    void SendLogin();
+    void SendRegister();
+    void ReceiveLogin(const QList<QString>& message);
+    void ReceiveRegister(const QList<QString>& message);
 
     QLineEdit* loginBox_ = nullptr;
     QLineEdit* passwordBox_ = nullptr;
-    QLabel* connectLabel_ = nullptr;
+    QLabel* infoLabel_ = nullptr;
     QLabel* headerLabel_ = nullptr;
     QPushButton* swapButton_ = nullptr;
     QPushButton* activeButton_ = nullptr;

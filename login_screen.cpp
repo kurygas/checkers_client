@@ -1,60 +1,40 @@
 #include "login_screen.h"
 
-LoginScreen::LoginScreen(Socket& socket, PlayerInfo& player)
+LoginScreen::LoginScreen(Socket* socket, PlayerInfo& player)
 : ApplicationWindow(socket, player) {}
 
 void LoginScreen::OpenLogin() {
     headerLabel_->setText("Checkers Online");
     activeButton_->setText("Log in");
-    connect(activeButton_, &QPushButton::pressed, this, &LoginScreen::Login);
+    disconnect(activeButton_, &QPushButton::pressed, nullptr, nullptr);
+    connect(activeButton_, &QPushButton::pressed, this, &LoginScreen::SendLogin);
     swapButton_->setText("Register");
     connect(swapButton_, &QPushButton::pressed, this, &LoginScreen::OpenRegistration);
-    connectLabel_->hide();
+    infoLabel_->hide();
     ClearBoxes();
 }
 
 void LoginScreen::OpenRegistration() {
     headerLabel_->setText("Registration");
     activeButton_->setText("Register");
-    connect(activeButton_, &QPushButton::pressed, this, &LoginScreen::Register);
+    disconnect(activeButton_, &QPushButton::pressed, nullptr, nullptr);
+    connect(activeButton_, &QPushButton::pressed, this, &LoginScreen::SendRegister);
     swapButton_->setText("Back");
     connect(swapButton_, &QPushButton::pressed, this, &LoginScreen::OpenLogin);
-    connectLabel_->hide();
+    infoLabel_->hide();
     ClearBoxes();
 }
 
-void LoginScreen::Request(const QString& type) {
-    socket_.Write(type + '$' + loginBox_->text() + '$' + passwordBox_->text());
-    connectLabel_->show();
-    connectLabel_->setText(socket_.Read().c_str());
-
-    if (connectLabel_->text() != "Success") {
-        connectLabel_->setStyleSheet("QLabel {color: red;}");
-    }
-    else {
-        EraseWindow();
-        lobby_->DrawWindow();
-    }
-}
-
-void LoginScreen::Login() {
-    Request("login");
-}
-
-void LoginScreen::Register() {
-    Request("register");
-}
-
 void LoginScreen::ClearBoxes() {
-    loginBox_->setText("");
-    passwordBox_->setText("");
+    loginBox_->clear();
+    passwordBox_->clear();
 }
 
-void LoginScreen::SetLobby(ApplicationWindow* lobby) {
+void LoginScreen::SetLobbyScreen(ApplicationWindow* lobby) {
     lobby_ = lobby;
 }
 
-void LoginScreen::DrawWindow() {
+void LoginScreen::Draw() {
     headerLabel_ = new QLabel(this);
     headerLabel_->setFont(QFont("Arial", 50));
     headerLabel_->setGeometry(0, 0, screenWidth_, 250);
@@ -72,24 +52,123 @@ void LoginScreen::DrawWindow() {
     activeButton_ = new QPushButton(this);
     activeButton_->setGeometry((screenWidth_ - 300) / 2, 420, 300, 50);
 
-    connectLabel_ = new QLabel(this);
-    connectLabel_->setAlignment(Qt::AlignCenter);
-    connectLabel_->setGeometry((screenWidth_ - 300) / 2, 480, 300, 50);
+    infoLabel_ = new QLabel(this);
+    infoLabel_->setAlignment(Qt::AlignCenter);
+    infoLabel_->setGeometry((screenWidth_ - 300) / 2, 480, 300, 50);
 
     swapButton_ = new QPushButton(this);
     swapButton_->setGeometry((screenWidth_ - 300) / 2, 540, 300, 50);
 
     OpenLogin();
-    show();
 }
 
-void LoginScreen::EraseWindow() {
-    delete headerLabel_;
-    delete loginBox_;
-    delete passwordBox_;
-    delete activeButton_;
-    delete connectLabel_;
-    delete swapButton_;
+void LoginScreen::ShowError() {
+    infoLabel_->setStyleSheet("QLabel {color: red;}");
+    infoLabel_->show();
+}
 
-    hide();
+void LoginScreen::ShowSuccess() {
+    infoLabel_->setStyleSheet("QLabel {color: green;}");
+    infoLabel_->show();
+}
+
+void LoginScreen::ProcessMessage(const QList<QString>& message) {
+    if (message.front() == "login") {
+        ReceiveLogin(message);
+    }
+    else if (message.front() == "reg") {
+        ReceiveRegister(message);
+    }
+}
+
+void LoginScreen::ReceiveLogin(const QList<QString>& message) {
+    EnableButtons();
+    if (message[1] == "ok") {
+        player_.SetRating(message[2].toInt());
+        Close();
+        lobby_->Open();
+    }
+    else if (message[1] == "not exist") {
+        infoLabel_->setText("Login doesn't exist!");
+        ShowError();
+    }
+    else if (message[1] == "wrong password") {
+        infoLabel_->setText("Wrong password!");
+        ShowError();
+    }
+}
+
+void LoginScreen::ReceiveRegister(const QList<QString> &message) {
+    EnableButtons();
+    if (message[1] == "ok") {
+        OpenLogin();
+        infoLabel_->setText("Successful registration");
+        ShowSuccess();
+    }
+    else if (message[1] == "already exist") {
+        infoLabel_->setText("Login already exists");
+        ShowError();
+    }
+}
+
+bool LoginScreen::CheckBoxesInfo() {
+    auto login = loginBox_->text();
+    auto password = passwordBox_->text();
+
+    if (login.contains('#') || login.contains('$')) {
+        infoLabel_->setText("Login must not contain symbols # and $");
+        ShowError();
+        return false;
+    }
+
+    if (password.contains('#') || password.contains('$')) {
+        infoLabel_->setText("Password must not contain symbols # and $");
+        ShowError();
+        return false;
+    }
+
+    if (login.size() < 3) {
+        infoLabel_->setText("Login must contain at least 3 characters");
+        ShowError();
+        return false;
+    }
+
+    if (password.size() < 6) {
+        infoLabel_->setText("Password must contain at least 6 characters");
+        ShowError();
+        return false;
+    }
+
+    return true;
+}
+
+void LoginScreen::SendLogin() {
+    if (CheckBoxesInfo()) {
+        auto login = loginBox_->text();
+        player_.SetNickname(login);
+        socket_->Write({"login", login, passwordBox_->text()});
+        infoLabel_->setText("Please wait");
+        ShowWaitMessage();
+    }
+}
+
+void LoginScreen::SendRegister() {
+    if (CheckBoxesInfo()) {
+        socket_->Write({"reg", loginBox_->text(), passwordBox_->text()});
+        infoLabel_->setText("Please wait");
+        ShowWaitMessage();
+    }
+}
+
+void LoginScreen::ShowWaitMessage() {
+    infoLabel_->setText("Please wait");
+    infoLabel_->setStyleSheet("QLabel {color: black;}");
+    infoLabel_->show();
+    activeButton_->setEnabled(false);
+    swapButton_->setEnabled(false);
+}
+
+void LoginScreen::EnableButtons() {
+    activeButton_->setEnabled(true);
+    swapButton_->setEnabled(true);
 }

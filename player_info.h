@@ -1,14 +1,14 @@
 #pragma once
-#include <string>
+#include <QString>
 
 class PlayerInfo {
 public:
-    [[nodiscard]] const std::string& GetNickname() const;
-    void SetNickname(const std::string& newNickname);
+    [[nodiscard]] const QString& GetNickname() const;
+    void SetNickname(const QString& newNickname);
     [[nodiscard]] int GetRating() const;
     void SetRating(int newRating);
 
 private:
-    std::string nickname_ = "$";
+    QString nickname_ = "$";
     int rating_ = 0;
 };

@@ -1,10 +1,10 @@
 #include "player_info.h"
 
-const std::string& PlayerInfo::GetNickname() const {
+const QString& PlayerInfo::GetNickname() const {
     return nickname_;
 }
 
-void PlayerInfo::SetNickname(const std::string& newNickname) {
+void PlayerInfo::SetNickname(const QString& newNickname) {
     nickname_ = newNickname;
 }
 

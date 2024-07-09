@@ -2,7 +2,7 @@
 #include <QApplication>
 #include "socket.h"
 #include "login_screen.h"
-#include "lobby.h"
+#include "lobby_screen.h"
 #include "player_info.h"
 
 class Application : public QApplication {
@@ -10,8 +10,8 @@ public:
     Application(int argc, char* argv[]);
 
 private:
-    Socket socket_;
     PlayerInfo player_;
+    Socket* socket_;
     LoginScreen loginScreen_;
-    Lobby lobby_;
+    LobbyScreen lobby_;
 };

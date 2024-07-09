@@ -18,8 +18,8 @@ find_package(Qt6 COMPONENTS
 add_executable(checkers_client main.cpp
         login_screen.cpp
         login_screen.h
-        lobby.cpp
-        lobby.h
+        lobby_screen.cpp
+        lobby_screen.h
         socket.cpp
         socket.h
         application_window.cpp
@@ -28,6 +28,8 @@ add_executable(checkers_client main.cpp
         player_info.h
         application.cpp
         application.h
+        utility_functions.cpp
+        utility_functions.h
 )
 target_link_libraries(checkers_client
         Qt::Core

@@ -2,22 +2,15 @@
 #include <QTcpSocket>
 #include <QApplication>
 #include <QMessageBox>
-#include <QMetaObject>
-#include <exception>
-
-class ConnectionError: public std::exception {
-public:
-    [[nodiscard]] char* what() const noexcept override;
-};
+#include "utility_functions.h"
 
 class Socket : public QTcpSocket {
 public:
+    explicit Socket(QApplication* parent);
     void ConnectToServer();
-    void Write(const QString& data);
-    std::string Read();
     void PrepareForClose();
     static void ConnectionLost();
 
-private:
-    QMetaObject::Connection connectionLostCall_;
+    void Write(const QList<QString>& message);
+    QList<QList<QString>> Read();
 };
