@@ -25,9 +25,9 @@ void Socket::PrepareForClose() {
 }
 
 void Socket::Write(const QList<QString>& message) {
-    write(Combine(message).toUtf8());
+    write('#' + message.join('$').toUtf8());
 }
 
 QList<QList<QString>> Socket::Read() {
-    return Parse(readAll());
+    return Parse(QString(readAll()));
 }

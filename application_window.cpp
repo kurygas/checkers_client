@@ -12,6 +12,7 @@ ApplicationWindow::ApplicationWindow(Socket* socket, PlayerInfo& player)
 void ApplicationWindow::Open() {
     connect(socket_, &QTcpSocket::readyRead, this, &ApplicationWindow::ReceiveMessage);
     isActive_ = true;
+    setCentralWidget(new QWidget());
     Draw();
     show();
 }

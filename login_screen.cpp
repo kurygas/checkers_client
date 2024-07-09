@@ -35,28 +35,28 @@ void LoginScreen::SetLobbyScreen(ApplicationWindow* lobby) {
 }
 
 void LoginScreen::Draw() {
-    headerLabel_ = new QLabel(this);
+    headerLabel_ = new QLabel(centralWidget());
     headerLabel_->setFont(QFont("Arial", 50));
     headerLabel_->setGeometry(0, 0, screenWidth_, 250);
     headerLabel_->setAlignment(Qt::AlignCenter);
 
-    loginBox_ = new QLineEdit(this);
+    loginBox_ = new QLineEdit(centralWidget());
     loginBox_->setGeometry((screenWidth_ - 300) / 2, 300, 300, 50);
     loginBox_->setPlaceholderText("Type your login");
 
-    passwordBox_ = new QLineEdit(this);
+    passwordBox_ = new QLineEdit(centralWidget());
     passwordBox_->setGeometry((screenWidth_ - 300) / 2, 360, 300, 50);
     passwordBox_->setPlaceholderText("Type your password");
     passwordBox_->setEchoMode(QLineEdit::Password);
 
-    activeButton_ = new QPushButton(this);
+    activeButton_ = new QPushButton(centralWidget());
     activeButton_->setGeometry((screenWidth_ - 300) / 2, 420, 300, 50);
 
-    infoLabel_ = new QLabel(this);
+    infoLabel_ = new QLabel(centralWidget());
     infoLabel_->setAlignment(Qt::AlignCenter);
     infoLabel_->setGeometry((screenWidth_ - 300) / 2, 480, 300, 50);
 
-    swapButton_ = new QPushButton(this);
+    swapButton_ = new QPushButton(centralWidget());
     swapButton_->setGeometry((screenWidth_ - 300) / 2, 540, 300, 50);
 
     OpenLogin();

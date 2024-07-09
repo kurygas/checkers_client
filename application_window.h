@@ -5,7 +5,6 @@
 #include <QLayoutItem>
 #include "socket.h"
 #include "player_info.h"
-#include "utility_functions.h"
 
 class ApplicationWindow : public QMainWindow {
 public:

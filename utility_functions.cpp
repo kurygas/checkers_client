@@ -17,15 +17,3 @@ QList<QList<QString>> Parse(const QString& data) {
 
     return result;
 }
-
-QString Combine(const QList<QString>& data) {
-    QString result = "#";
-
-    for (const auto& str : data) {
-        result.push_back(str);
-        result.push_back('$');
-    }
-
-    result.chop(1);
-    return result;
-}
