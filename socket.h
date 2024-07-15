@@ -2,7 +2,7 @@
 #include <QTcpSocket>
 #include <QApplication>
 #include <QMessageBox>
-#include "utility_functions.h"
+#include "query.h"
 
 class Socket : public QTcpSocket {
 public:
@@ -11,6 +11,6 @@ public:
     void PrepareForClose();
     static void ConnectionLost();
 
-    void Write(const QList<QString>& message);
-    QList<QList<QString>> Read();
+    void Write(const Query& message);
+    QList<Query> Read();
 };

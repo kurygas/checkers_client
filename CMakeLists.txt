@@ -28,8 +28,12 @@ add_executable(checkers_client main.cpp
         player_info.h
         application.cpp
         application.h
-        utility_functions.cpp
-        utility_functions.h
+        room_button.cpp
+        room_button.h
+        create_room_window.cpp
+        create_room_window.h
+        query.cpp
+        query.h
 )
 target_link_libraries(checkers_client
         Qt::Core

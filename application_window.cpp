@@ -1,11 +1,12 @@
 #include "application_window.h"
 
-ApplicationWindow::ApplicationWindow(Socket* socket, PlayerInfo& player)
+ApplicationWindow::ApplicationWindow(Socket* socket, PlayerInfo& player, const QString& windowTitle)
 : screenWidth_(QApplication::primaryScreen()->geometry().width())
-, screenHeight_(QApplication::primaryScreen()->geometry().height())
+, screenHeight_(QApplication::primaryScreen()->geometry().height() - 140)
 , socket_(socket)
 , player_(player) {
     setWindowState(Qt::WindowMaximized);
+    setWindowTitle(windowTitle);
     connect(this, &QMainWindow::destroyed, socket_, &Socket::PrepareForClose);
 }
 

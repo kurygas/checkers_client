@@ -9,6 +9,6 @@ public:
     void SetRating(int newRating);
 
 private:
-    QString nickname_ = "$";
+    QString nickname_;
     int rating_ = 0;
 };

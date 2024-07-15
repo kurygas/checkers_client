@@ -1,7 +1,7 @@
 #include "login_screen.h"
 
-LoginScreen::LoginScreen(Socket* socket, PlayerInfo& player)
-: ApplicationWindow(socket, player) {}
+LoginScreen::LoginScreen(const QString& windowTitle, Socket* socket, PlayerInfo& player)
+: ApplicationWindow(socket, player, windowTitle) {}
 
 void LoginScreen::OpenLogin() {
     headerLabel_->setText("Checkers Online");
@@ -72,40 +72,42 @@ void LoginScreen::ShowSuccess() {
     infoLabel_->show();
 }
 
-void LoginScreen::ProcessMessage(const QList<QString>& message) {
-    if (message.front() == "login") {
-        ReceiveLogin(message);
+void LoginScreen::ProcessMessage(const Query& query) {
+    if (query.GetId() == QueryId::Login) {
+        ReceiveLogin(query);
     }
-    else if (message.front() == "reg") {
-        ReceiveRegister(message);
+    else if (query.GetId() == QueryId::Register) {
+        ReceiveRegister(query);
     }
 }
 
-void LoginScreen::ReceiveLogin(const QList<QString>& message) {
+void LoginScreen::ReceiveLogin(const Query& query) {
     EnableButtons();
-    if (message[1] == "ok") {
-        player_.SetRating(message[2].toInt());
+
+    if (query.GetIdInfo(0) == QueryId::Ok) {
+        player_.SetRating(query.GetStringInfo(1).toInt());
         Close();
         lobby_->Open();
     }
-    else if (message[1] == "not exist") {
+    else if (query.GetIdInfo(0) == QueryId::NotExist) {
         infoLabel_->setText("Login doesn't exist!");
         ShowError();
     }
-    else if (message[1] == "wrong password") {
+    else if (query.GetIdInfo(0) == QueryId::WrongPassword) {
         infoLabel_->setText("Wrong password!");
         ShowError();
     }
 }
 
-void LoginScreen::ReceiveRegister(const QList<QString> &message) {
+void LoginScreen::ReceiveRegister(const Query& query) {
     EnableButtons();
-    if (message[1] == "ok") {
+
+    if (query.GetIdInfo(0) == QueryId::Ok) {
         OpenLogin();
         infoLabel_->setText("Successful registration");
         ShowSuccess();
     }
-    else if (message[1] == "already exist") {
+    else if (query.GetIdInfo(0) == QueryId::AlreadyExist) {
         infoLabel_->setText("Login already exists");
         ShowError();
     }
@@ -114,18 +116,6 @@ void LoginScreen::ReceiveRegister(const QList<QString> &message) {
 bool LoginScreen::CheckBoxesInfo() {
     auto login = loginBox_->text();
     auto password = passwordBox_->text();
-
-    if (login.contains('#') || login.contains('$')) {
-        infoLabel_->setText("Login must not contain symbols # and $");
-        ShowError();
-        return false;
-    }
-
-    if (password.contains('#') || password.contains('$')) {
-        infoLabel_->setText("Password must not contain symbols # and $");
-        ShowError();
-        return false;
-    }
 
     if (login.size() < 3) {
         infoLabel_->setText("Login must contain at least 3 characters");
@@ -144,9 +134,12 @@ bool LoginScreen::CheckBoxesInfo() {
 
 void LoginScreen::SendLogin() {
     if (CheckBoxesInfo()) {
+        Query query(QueryId::Login);
         auto login = loginBox_->text();
         player_.SetNickname(login);
-        socket_->Write({"login", login, passwordBox_->text()});
+        query.PushInfo(login);
+        query.PushInfo(passwordBox_->text());
+        socket_->Write(query);
         infoLabel_->setText("Please wait");
         ShowWaitMessage();
     }
@@ -154,7 +147,10 @@ void LoginScreen::SendLogin() {
 
 void LoginScreen::SendRegister() {
     if (CheckBoxesInfo()) {
-        socket_->Write({"reg", loginBox_->text(), passwordBox_->text()});
+        Query query(QueryId::Register);
+        query.PushInfo(loginBox_->text());
+        query.PushInfo(passwordBox_->text());
+        socket_->Write(query);
         infoLabel_->setText("Please wait");
         ShowWaitMessage();
     }

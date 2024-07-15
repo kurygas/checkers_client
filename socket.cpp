@@ -24,10 +24,25 @@ void Socket::PrepareForClose() {
     disconnect(this, &QTcpSocket::disconnected, nullptr, nullptr);
 }
 
-void Socket::Write(const QList<QString>& message) {
-    write('#' + message.join('$').toUtf8());
+void Socket::Write(const Query& message) {
+    write(message.ToBytes());
 }
 
-QList<QList<QString>> Socket::Read() {
-    return Parse(QString(readAll()));
+QList<Query> Socket::Read() {
+    QByteArray buffer;
+    QList<Query> result;
+
+    for (const auto& byte : readAll()) {
+        if (Query::Type(byte) == QueryId::QueryBegin) {
+            if (!buffer.isEmpty()) {
+                result.emplace_back(buffer);
+                buffer.clear();
+            }
+        }
+        else {
+            buffer.push_back(byte);
+        }
+    }
+
+    return result;
 }
