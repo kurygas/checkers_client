@@ -3,10 +3,18 @@
 Application::Application(int argc, char **argv)
 : QApplication(argc, argv)
 , socket_(new Socket(this))
-, loginScreen_("Authorization", socket_, player_)
-, lobby_("Lobby", socket_, player_, &loginScreen_) {
+, loginWindow_(socket_, player_)
+, lobbyWindow_(socket_, player_)
+, registrationWindow_(socket_, player_) {
     socket_->ConnectToServer();
-    loginScreen_.SetLobbyScreen(&lobby_);
+
+    loginWindow_.SetLobbyWindow(&lobbyWindow_);
+    loginWindow_.SetRegisterWindow(&registrationWindow_);
+
+    registrationWindow_.SetLoginWindow(&loginWindow_);
+
+    lobbyWindow_.SetLoginWindow(&loginWindow_);
+
     connect(this, &QApplication::aboutToQuit, socket_, &Socket::PrepareForClose);
-    loginScreen_.Open();
+    loginWindow_.Open();
 }

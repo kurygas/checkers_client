@@ -1,32 +1,42 @@
 #include "query.h"
 
-QueryId Query::Type(char symbol) {
-    return static_cast<QueryId>(static_cast<uint8_t>(symbol));
+uint8_t Query::ToNum(char symbol) {
+    return static_cast<uint8_t>(symbol);
+}
+
+QueryId Query::ToType(char symbol) {
+    return static_cast<QueryId>(ToNum(symbol));
 }
 
 Query::Query(QueryId queryId)
-: queryId_(queryId) {}
+        : queryId_(queryId) {}
 
 Query::Query(const QByteArray& bytes)
-: queryId_(Type(bytes.front())) {
+        : queryId_(ToType(bytes.front())) {
     for (int i = 1; i < bytes.size(); ++i) {
-        if (Type(bytes[i]) == QueryId::StringBegin) {
-            auto stringSize = static_cast<uint8_t>(bytes[i + 1]);
-            queryData_.push_back(QString(bytes.sliced(i + 2, stringSize)));
+        if (ToType(bytes[i]) == QueryId::String) {
+            const uint16_t stringSize = ToNum(bytes[i + 1]);
+            queryData_.push_back(bytes.sliced(i + 2, stringSize));
             i += stringSize + 1;
         }
+        else if (ToType(bytes[i]) == QueryId::Int) {
+            uint result = 0;
+
+            for (int j = 0; j < 4; ++j) {
+                const uint byte = ToNum(bytes[i + j + 1]) << (8 * j);
+                result += byte;
+            }
+
+            queryData_.push_back(result);
+        }
         else {
-            queryData_.emplace_back(static_cast<uint8_t>(bytes[i]));
+            queryData_.push_back(ToType(bytes[i]));
         }
     }
 }
 
-void Query::PushInfo(QueryId info) {
-    queryData_.emplace_back(static_cast<uint8_t>(info));
-}
-
-void Query::PushInfo(const QString& info) {
-    queryData_.emplace_back(info);
+void Query::PushData(const std::variant<QString, uint, QueryId>& data) {
+    queryData_.push_back(data);
 }
 
 QueryId Query::GetId() const {
@@ -34,30 +44,33 @@ QueryId Query::GetId() const {
 }
 
 QByteArray Query::ToBytes() const {
-    QByteArray result(1, static_cast<char>(QueryId::QueryBegin));
-    result.push_back(static_cast<char>(queryId_));
+    QByteArray result(1, ToChar(QueryId::Query));
+    result.push_back(ToChar(queryId_));
 
-    for (const auto& info : queryData_) {
-        if (info.canConvert<int>()) {
-            result.push_back(static_cast<char>(info.toInt()));
+    for (const auto& data : queryData_) {
+        if (std::holds_alternative<QueryId>(data)) {
+            result.push_back(ToChar(std::get<QueryId>(data)));
+        }
+        else if (std::holds_alternative<uint>(data)) {
+            uint16_t number = std::get<uint>(data);
+
+            for (int i = 0; i < 4; ++i) {
+                result.push_back(ToChar(number & 0xFF));
+                number >>= 8;
+            }
+
+            result.push_back(ToChar(number & 0xFF));
+            result.push_back(ToChar(number >> 8));
         }
         else {
-            auto str = info.toString();
-            result.push_back(static_cast<char>(QueryId::StringBegin));
-            result.push_back(static_cast<char>(str.size()));
+            const auto str = std::get<QString>(data);
+            result.push_back(ToChar(QueryId::String));
+            result.push_back(ToChar(str.size()));
             result.push_back(str.toUtf8());
         }
     }
 
     return result;
-}
-
-QString Query::GetStringInfo(int index) const {
-    return queryData_[index].toString();
-}
-
-QueryId Query::GetIdInfo(int index) const {
-    return static_cast<QueryId>(queryData_[index].toUInt());
 }
 
 size_t Query::Size() const {

@@ -1,30 +1,24 @@
 #pragma once
-#include <QVariant>
 #include <QString>
 #include <QList>
+#include <variant>
 
 enum class QueryId {
-    QueryBegin = 0,
-    StringBegin,
+    Query = 0,
+    String,
+    Int,
     Login,
     Register,
-    Join,
-    Create,
     ChangeNickname,
     ChangePassword,
-    AcceptResult,
-    Accept,
-    Ok,
+    FindGame,
+    WrongPassword,
     NotExist,
     AlreadyExist,
-    WrongPassword,
-    RoomList,
-    Public,
-    Private,
-    Accepted,
-    Declined,
-    Delete,
-    Same
+    Ok,
+    EnemyDisconnected,
+    StartGame,
+    CancelSearching
 };
 
 class Query {
@@ -32,18 +26,26 @@ public:
     explicit Query(QueryId queryId);
     explicit Query(const QByteArray& bytes);
 
-    void PushInfo(const QString& info);
-    void PushInfo(QueryId info);
+    void PushData(const std::variant<QString, uint, QueryId>& data);
+    QByteArray ToBytes() const;
+    size_t Size() const;
+    QueryId GetId() const;
 
-    [[nodiscard]] QueryId GetId() const;
-    [[nodiscard]] QueryId GetIdInfo(int index) const;
-    [[nodiscard]] QString GetStringInfo(int index) const;
-    [[nodiscard]] QByteArray ToBytes() const;
-    [[nodiscard]] size_t Size() const;
+    static uint8_t ToNum(char symbol);
+    static QueryId ToType(char symbol);
 
-    static QueryId Type(char symbol);
+    template<typename T>
+    static char ToChar(T&& data) {
+        return static_cast<char>(data);
+    }
+
+    template<typename T>
+    const T& GetData(size_t index) const {
+        return std::get<T>(queryData_[index]);
+    }
+
 
 private:
     QueryId queryId_;
-    QList<QVariant> queryData_;
+    QList<std::variant<QString, uint, QueryId>> queryData_;
 };

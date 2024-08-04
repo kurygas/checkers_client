@@ -33,7 +33,7 @@ QList<Query> Socket::Read() {
     QList<Query> result;
 
     for (const auto& byte : readAll()) {
-        if (Query::Type(byte) == QueryId::QueryBegin) {
+        if (Query::ToType(byte) == QueryId::Query) {
             if (!buffer.isEmpty()) {
                 result.emplace_back(buffer);
                 buffer.clear();
@@ -44,5 +44,6 @@ QList<Query> Socket::Read() {
         }
     }
 
+    result.emplace_back(buffer);
     return result;
 }
