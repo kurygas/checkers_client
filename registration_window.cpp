@@ -1,12 +1,10 @@
 #include "registration_window.h"
 
-RegistrationWindow::RegistrationWindow(Socket* socket, PlayerInfo& player)
-: AuthWindow(socket, player) {}
+RegistrationWindow::RegistrationWindow(Socket* socket, PlayerInfo& player, const QString& windowTitle)
+: AuthWindow(socket, player, windowTitle) {}
 
 void RegistrationWindow::Draw() {
     AuthWindow::Draw();
-
-    headerLabel_->setText("Registration");
 
     registerButton_ = new QPushButton("Register", centralWidget());
     connect(registerButton_, &QPushButton::clicked, this, &RegistrationWindow::SendRegister);
@@ -27,17 +25,18 @@ void RegistrationWindow::OpenLogin() {
 }
 
 void RegistrationWindow::ProcessMessage(const Query& query) {
-    if (query.GetId() == QueryId::Register) {
+    if (query.Type() == QueryId::Register) {
         ReceiveRegister(query);
     }
 }
 
 void RegistrationWindow::ReceiveRegister(const Query& query) {
-    const auto& result = query.GetData<QueryId>(0);
+    const auto result = query.GetId(0);
 
     if (result == QueryId::Ok) {
         ShowInfo("Successful registration");
         OpenLogin();
+        return;
     }
     else if (result == QueryId::AlreadyExist) {
         ShowError("Login already exists");
@@ -51,8 +50,8 @@ void RegistrationWindow::ReceiveRegister(const Query& query) {
 void RegistrationWindow::SendRegister() {
     if (CheckBoxes()) {
         Query query(QueryId::Register);
-        query.PushData(nicknameBox_->text());
-        query.PushData(passwordBox_->text());
+        query.PushString(nicknameBox_->text());
+        query.PushString(passwordBox_->text());
         socket_->Write(query);
         infoLabel_->setText("Please wait");
         registerButton_->setEnabled(false);

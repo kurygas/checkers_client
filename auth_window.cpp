@@ -14,21 +14,8 @@ void AuthWindow::Draw() {
 }
 
 bool AuthWindow::CheckBoxes() const {
-    const auto& nickname = nicknameBox_->text();
-    const auto& password = passwordBox_->text();
-
-    if (nickname.size() < 3) {
-        ShowError("Nickname must contain at least 3 characters");
-        return false;
-    }
-
-    if (password.size() < 6) {
-        ShowError("Password must contain at least 6 characters");
-        return false;
-    }
-
-    return true;
+    return CheckNickname(nicknameBox_->text()) && CheckPassword(passwordBox_->text());
 }
 
-AuthWindow::AuthWindow(Socket* socket, PlayerInfo& player)
-: ApplicationWindow(socket, player) {}
+AuthWindow::AuthWindow(Socket* socket, PlayerInfo& player, const QString& windowTitle)
+: ApplicationWindow(socket, player, windowTitle) {}

@@ -1,9 +1,9 @@
 #include "application_window.h"
 
-ApplicationWindow::ApplicationWindow(Socket* socket, PlayerInfo& player)
+ApplicationWindow::ApplicationWindow(Socket* socket, PlayerInfo& player, const QString& windowTitle)
 : socket_(socket)
 , player_(player) {
-    setWindowTitle("Checkers Online");
+    setWindowTitle(windowTitle);
     connect(this, &QMainWindow::destroyed, socket_, &Socket::PrepareForClose);
 }
 
@@ -16,8 +16,7 @@ void ApplicationWindow::Open() {
 void ApplicationWindow::Draw() {
     setCentralWidget(new QWidget());
     layout_ = new QVBoxLayout(centralWidget());
-    headerLabel_ = new QLabel(centralWidget());
-    layout_->addWidget(headerLabel_);
+    layout_->setAlignment(Qt::AlignHCenter);
 }
 
 void ApplicationWindow::Close() {
@@ -42,4 +41,22 @@ void ApplicationWindow::ShowError(const QString& text) {
 
 void ApplicationWindow::ShowInfo(const QString& text) {
     QMessageBox::information(nullptr, "Checkers Online", text);
+}
+
+bool ApplicationWindow::CheckNickname(const QString& nickname) {
+    if (nickname.size() < 3) {
+        ShowError("Nickname must contain at least 3 characters");
+        return false;
+    }
+
+    return true;
+}
+
+bool ApplicationWindow::CheckPassword(const QString &password) {
+    if (password.size() < 6) {
+        ShowError("Password must contain at least 6 characters");
+        return false;
+    }
+
+    return true;
 }

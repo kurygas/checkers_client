@@ -1,7 +1,7 @@
 #include "login_window.h"
 
-LoginWindow::LoginWindow(Socket* socket, PlayerInfo& player)
-: AuthWindow(socket, player) {}
+LoginWindow::LoginWindow(Socket* socket, PlayerInfo& player, const QString& windowTitle)
+: AuthWindow(socket, player, windowTitle) {}
 
 void LoginWindow::SetLobbyWindow(ApplicationWindow* lobby) {
     lobbyWindow_ = lobby;
@@ -13,8 +13,6 @@ void LoginWindow::SetRegisterWindow(ApplicationWindow *reg) {
 
 void LoginWindow::Draw() {
     AuthWindow::Draw();
-
-    headerLabel_->setText("Authorization");
 
     loginButton_ = new QPushButton("Log in", centralWidget());
     connect(loginButton_, &QPushButton::pressed, this, &LoginWindow::SendLogin);
@@ -34,18 +32,19 @@ void LoginWindow::OpenRegistration() {
 }
 
 void LoginWindow::ProcessMessage(const Query& query) {
-    if (query.GetId() == QueryId::Login) {
+    if (query.Type() == QueryId::Login) {
         ReceiveLogin(query);
     }
 }
 
 void LoginWindow::ReceiveLogin(const Query& query) {
-    const auto& result = query.GetData<QueryId>(0);
+    const auto result = query.GetId(0);
 
     if (result == QueryId::Ok) {
-        player_.SetRating(query.GetData<uint>(1));
+        player_.rating = query.GetUInt(1);;
         Close();
         lobbyWindow_->Open();
+        return;
     }
     else if (result == QueryId::NotExist) {
         ShowError("Login doesn't exist!");
@@ -62,10 +61,10 @@ void LoginWindow::ReceiveLogin(const Query& query) {
 void LoginWindow::SendLogin() {
     if (CheckBoxes()) {
         Query query(QueryId::Login);
-        const auto& login = nicknameBox_->text();
-        player_.SetNickname(login);
-        query.PushData(login);
-        query.PushData(passwordBox_->text());
+        const auto login = nicknameBox_->text();
+        player_.nickname = login;
+        query.PushString(login);
+        query.PushString(passwordBox_->text());
         socket_->Write(query);
         infoLabel_->setText("Please wait");
         loginButton_->setEnabled(false);

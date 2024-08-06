@@ -5,7 +5,7 @@
 
 class RegistrationWindow : public AuthWindow {
 public:
-    explicit RegistrationWindow(Socket* socket, PlayerInfo& player);
+    explicit RegistrationWindow(Socket* socket, PlayerInfo& playe, const QString& windowTitle);
     void SetLoginWindow(ApplicationWindow* login);
 
 private:

@@ -10,7 +10,7 @@
 
 class LoginWindow : public AuthWindow {
 public:
-    LoginWindow(Socket* socket, PlayerInfo& player);
+    LoginWindow(Socket* socket, PlayerInfo& player, const QString& windowTitle);
     void SetLobbyWindow(ApplicationWindow* lobby);
     void SetRegisterWindow(ApplicationWindow* reg);
 

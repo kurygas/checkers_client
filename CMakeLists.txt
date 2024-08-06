@@ -24,7 +24,6 @@ add_executable(checkers_client main.cpp
         socket.h
         application_window.cpp
         application_window.h
-        player_info.cpp
         player_info.h
         application.cpp
         application.h

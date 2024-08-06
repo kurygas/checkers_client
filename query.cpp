@@ -1,78 +1,99 @@
 #include "query.h"
 
-uint8_t Query::ToNum(char symbol) {
-    return static_cast<uint8_t>(symbol);
-}
-
-QueryId Query::ToType(char symbol) {
-    return static_cast<QueryId>(ToNum(symbol));
-}
-
 Query::Query(QueryId queryId)
-        : queryId_(queryId) {}
+: queryId_(queryId) {}
 
 Query::Query(const QByteArray& bytes)
-        : queryId_(ToType(bytes.front())) {
-    for (int i = 1; i < bytes.size(); ++i) {
-        if (ToType(bytes[i]) == QueryId::String) {
-            const uint16_t stringSize = ToNum(bytes[i + 1]);
-            queryData_.push_back(bytes.sliced(i + 2, stringSize));
+: queryId_(ToId(bytes.front())) {
+    for (uint i = 1; i < bytes.size(); ++i) {
+        const auto id = ToId(bytes[i]);
+
+        if (id == QueryId::String) {
+            const auto stringSize = ToInt(bytes[i + 1]);
+            queryData_.emplace_back(Data::DataType::String, bytes.sliced(i + 2, stringSize));
             i += stringSize + 1;
         }
-        else if (ToType(bytes[i]) == QueryId::Int) {
+        else if (id == QueryId::Int) {
             uint result = 0;
 
             for (int j = 0; j < 4; ++j) {
-                const uint byte = ToNum(bytes[i + j + 1]) << (8 * j);
+                const auto byte = ToInt(bytes[i + j + 1]) << (8 * j);
                 result += byte;
             }
 
-            queryData_.push_back(result);
+            queryData_.emplace_back(Data::DataType::Uint, result);
         }
         else {
-            queryData_.push_back(ToType(bytes[i]));
+            queryData_.emplace_back(Data::DataType::Id, ToInt(bytes[i]));
         }
     }
 }
 
-void Query::PushData(const std::variant<QString, uint, QueryId>& data) {
-    queryData_.push_back(data);
-}
-
-QueryId Query::GetId() const {
+QueryId Query::Type() const {
     return queryId_;
 }
 
 QByteArray Query::ToBytes() const {
-    QByteArray result(1, ToChar(QueryId::Query));
+    QByteArray result;
     result.push_back(ToChar(queryId_));
 
     for (const auto& data : queryData_) {
-        if (std::holds_alternative<QueryId>(data)) {
-            result.push_back(ToChar(std::get<QueryId>(data)));
+        if (data.type == Data::DataType::Id) {
+            result.push_back(ToChar(data.var.toUInt()));
         }
-        else if (std::holds_alternative<uint>(data)) {
-            uint16_t number = std::get<uint>(data);
+        else if (data.type == Data::DataType::Uint) {
+            auto number = data.var.toUInt();
+            result.push_back(ToChar(QueryId::Int));
 
             for (int i = 0; i < 4; ++i) {
                 result.push_back(ToChar(number & 0xFF));
                 number >>= 8;
             }
-
-            result.push_back(ToChar(number & 0xFF));
-            result.push_back(ToChar(number >> 8));
         }
         else {
-            const auto str = std::get<QString>(data);
+            const auto& str = data.var.toString();
             result.push_back(ToChar(QueryId::String));
             result.push_back(ToChar(str.size()));
             result.push_back(str.toUtf8());
         }
     }
 
+    result.push_front(ToChar(result.size()));
     return result;
 }
 
-size_t Query::Size() const {
-    return queryData_.size();
+void Query::PushString(const QString& data) {
+    queryData_.emplace_back(Data::DataType::String, data);
+}
+
+void Query::PushUInt(const uint data) {
+    queryData_.emplace_back(Data::DataType::Uint, data);
+}
+
+void Query::PushId(const QueryId data) {
+    queryData_.emplace_back(Data::DataType::Id, static_cast<uint>(static_cast<uint8_t>(data)));
+}
+
+Query::Query(const Query& other)
+: queryId_(other.queryId_) {
+    for (const auto& data : other.queryData_) {
+        if (data.type == Data::DataType::String) {
+            queryData_.emplace_back(data.type, data.var.toString());
+        }
+        else {
+            queryData_.emplace_back(data.type, data.var.toUInt());
+        }
+    }
+}
+
+QString Query::GetString(qsizetype index) const {
+    return queryData_[index].var.toString();
+}
+
+uint Query::GetUInt(qsizetype index) const {
+    return queryData_[index].var.toUInt();
+}
+
+QueryId Query::GetId(qsizetype index) const {
+    return static_cast<QueryId>(static_cast<uint8_t>(queryData_[index].var.toUInt()));
 }

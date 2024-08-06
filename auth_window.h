@@ -4,7 +4,7 @@
 
 class AuthWindow : public ApplicationWindow {
 public:
-    AuthWindow(Socket* socket, PlayerInfo& player);
+    AuthWindow(Socket* socket, PlayerInfo& player, const QString& windowTitle);
 
 protected:
     void Draw() override;

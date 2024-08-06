@@ -29,21 +29,20 @@ void Socket::Write(const Query& message) {
 }
 
 QList<Query> Socket::Read() {
-    QByteArray buffer;
     QList<Query> result;
+    const auto data = readAll();
 
-    for (const auto& byte : readAll()) {
-        if (Query::ToType(byte) == QueryId::Query) {
-            if (!buffer.isEmpty()) {
-                result.emplace_back(buffer);
-                buffer.clear();
-            }
+    for (uint i = 0; i < data.size(); ++i) {
+        QByteArray buffer;
+        const auto querySize = Query::ToInt(data[i]);
+
+        for (uint j = 0; j < querySize; ++j) {
+            buffer.push_back(data[i + j + 1]);
         }
-        else {
-            buffer.push_back(byte);
-        }
+
+        result.emplace_back(buffer);
+        i += querySize;
     }
 
-    result.emplace_back(buffer);
     return result;
 }

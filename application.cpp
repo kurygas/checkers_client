@@ -3,9 +3,9 @@
 Application::Application(int argc, char **argv)
 : QApplication(argc, argv)
 , socket_(new Socket(this))
-, loginWindow_(socket_, player_)
-, lobbyWindow_(socket_, player_)
-, registrationWindow_(socket_, player_) {
+, loginWindow_(socket_, player_, "Authorization")
+, lobbyWindow_(socket_, player_, "Checkers Online")
+, registrationWindow_(socket_, player_, "Registration") {
     socket_->ConnectToServer();
 
     loginWindow_.SetLobbyWindow(&lobbyWindow_);
