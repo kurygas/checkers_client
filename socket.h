@@ -1,7 +1,7 @@
 #pragma once
 #include <QTcpSocket>
-#include <QApplication>
 #include <QMessageBox>
+#include <QApplication>
 #include "query.h"
 
 class Socket : public QTcpSocket {

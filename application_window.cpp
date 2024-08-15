@@ -21,7 +21,7 @@ void ApplicationWindow::Draw() {
 
 void ApplicationWindow::Close() {
     disconnect(socket_, &QTcpSocket::readyRead, nullptr, nullptr);
-    delete takeCentralWidget();
+    takeCentralWidget()->deleteLater();
     hide();
 }
 

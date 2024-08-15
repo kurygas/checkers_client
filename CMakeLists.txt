@@ -24,7 +24,6 @@ add_executable(checkers_client main.cpp
         socket.h
         application_window.cpp
         application_window.h
-        player_info.h
         application.cpp
         application.h
         query.cpp
@@ -33,6 +32,16 @@ add_executable(checkers_client main.cpp
         registration_window.h
         auth_window.cpp
         auth_window.h
+        game_window.cpp
+        game_window.h
+        cell.cpp
+        cell.h
+        checker.cpp
+        checker.h
+        board.cpp
+        board.h
+        player_info.h
+        color.h
 )
 target_link_libraries(checkers_client
         Qt::Core

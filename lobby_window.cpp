@@ -3,8 +3,12 @@
 LobbyWindow::LobbyWindow(Socket* socket, PlayerInfo& player, const QString& windowTitle)
 : ApplicationWindow(socket, player, windowTitle) {}
 
-void LobbyWindow::SetLoginWindow(ApplicationWindow* loginWindow) {
+void LobbyWindow::SetLoginWindow(LoginWindow* loginWindow) {
     loginWindow_ = loginWindow;
+}
+
+void LobbyWindow::SetGameWindow(GameWindow* gameWindow) {
+    gameWindow_ = gameWindow;
 }
 
 void LobbyWindow::Draw() {
@@ -45,7 +49,7 @@ void LobbyWindow::Draw() {
 }
 
 void LobbyWindow::ProcessMessage(const Query& query) {
-    const auto& id = query.Type();
+    const auto id = query.Type();
 
     if (id == QueryId::StartGame) {
         ReceiveStartGame(query);
@@ -63,16 +67,17 @@ void LobbyWindow::ProcessMessage(const Query& query) {
 
 void LobbyWindow::SendFindGame() {
     Query query(QueryId::FindGame);
-    query.PushUInt(player_.rating / 100);
+    query.PushInt(1);
+    query.PushLong(player_.rating / 100);
     socket_->Write(query);
-    player_.inSearch = true;
+    inSearch_ = true;
     SearchLabelTimeout();
     EnableButtons(false);
     cancelButton_->show();
 }
 
 void LobbyWindow::SearchLabelTimeout() {
-    if (player_.inSearch) {
+    if (inSearch_) {
         ++timeInSearch_;
         auto minutes = QString::number(timeInSearch_ / 60);
         minutes = QString(2 - minutes.size(), '0') + minutes;
@@ -80,6 +85,23 @@ void LobbyWindow::SearchLabelTimeout() {
         seconds = QString(2 - seconds.size(), '0') + seconds;
         infoLabel_->setText("Queue time: " + minutes + ':' + seconds);
         searchingTimer_->start(1s);
+
+        if (timeInSearch_ % 10 == 0) {
+            const auto playerDivision = player_.rating / 100;
+            const auto divisionAddition = timeInSearch_ / 10;
+            Query query(QueryId::FindGame);
+
+            if (playerDivision >= divisionAddition) {
+                query.PushInt(2);
+                query.PushLong(playerDivision - divisionAddition);
+            }
+            else {
+                query.PushInt(1);
+            }
+
+            query.PushLong(playerDivision + divisionAddition);
+            socket_->Write(query);
+        }
     }
     else {
         EnableButtons(true);
@@ -88,8 +110,12 @@ void LobbyWindow::SearchLabelTimeout() {
     }
 }
 
-void LobbyWindow::ReceiveStartGame(const Query &query) {
-    qDebug() << "pobeda";
+void LobbyWindow::ReceiveStartGame(const Query& query) {
+    Close();
+    player_.enemyNickname = query.GetString(0);
+    player_.enemyRating = query.GetInt(1);
+    player_.playerColor = query.GetId(2) == QueryId::White ? Color::white : Color::black;
+    gameWindow_->Open();
 }
 
 void LobbyWindow::SendCancelSearching() {
@@ -97,7 +123,7 @@ void LobbyWindow::SendCancelSearching() {
 }
 
 void LobbyWindow::ReceiveCancelSearching() {
-    player_.inSearch = false;
+    inSearch_ = false;
 }
 
 void LobbyWindow::EnableButtons(const bool state) {
@@ -173,4 +199,3 @@ void LobbyWindow::ReceiveChangePassword(const Query& query) {
 
     EnableButtons(true);
 }
-

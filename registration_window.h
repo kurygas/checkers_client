@@ -1,12 +1,14 @@
 #pragma once
-#include <QLineEdit>
 #include <QPushButton>
 #include "auth_window.h"
+#include "login_window.h"
+
+class LoginWindow;
 
 class RegistrationWindow : public AuthWindow {
 public:
-    explicit RegistrationWindow(Socket* socket, PlayerInfo& playe, const QString& windowTitle);
-    void SetLoginWindow(ApplicationWindow* login);
+    explicit RegistrationWindow(Socket* socket, PlayerInfo& player, const QString& windowTitle);
+    void SetLoginWindow(LoginWindow* login);
 
 private:
     void Draw() override;
@@ -20,5 +22,5 @@ private:
     QLabel* infoLabel_ = nullptr;
     QPushButton* backButton_ = nullptr;
 
-    ApplicationWindow* loginWindow_ = nullptr;
+    LoginWindow* loginWindow_ = nullptr;
 };

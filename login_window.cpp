@@ -3,11 +3,11 @@
 LoginWindow::LoginWindow(Socket* socket, PlayerInfo& player, const QString& windowTitle)
 : AuthWindow(socket, player, windowTitle) {}
 
-void LoginWindow::SetLobbyWindow(ApplicationWindow* lobby) {
+void LoginWindow::SetLobbyWindow(LobbyWindow* lobby) {
     lobbyWindow_ = lobby;
 }
 
-void LoginWindow::SetRegisterWindow(ApplicationWindow *reg) {
+void LoginWindow::SetRegisterWindow(RegistrationWindow* reg) {
     registrationWindow_ = reg;
 }
 
@@ -41,7 +41,7 @@ void LoginWindow::ReceiveLogin(const Query& query) {
     const auto result = query.GetId(0);
 
     if (result == QueryId::Ok) {
-        player_.rating = query.GetUInt(1);;
+        player_.rating = query.GetInt(1);
         Close();
         lobbyWindow_->Open();
         return;
@@ -61,9 +61,8 @@ void LoginWindow::ReceiveLogin(const Query& query) {
 void LoginWindow::SendLogin() {
     if (CheckBoxes()) {
         Query query(QueryId::Login);
-        const auto login = nicknameBox_->text();
-        player_.nickname = login;
-        query.PushString(login);
+        player_.nickname = nicknameBox_->text();
+        query.PushString(player_.nickname);
         query.PushString(passwordBox_->text());
         socket_->Write(query);
         infoLabel_->setText("Please wait");

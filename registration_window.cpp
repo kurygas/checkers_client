@@ -59,6 +59,6 @@ void RegistrationWindow::SendRegister() {
     }
 }
 
-void RegistrationWindow::SetLoginWindow(ApplicationWindow* login) {
+void RegistrationWindow::SetLoginWindow(LoginWindow* login) {
     loginWindow_ = login;
 }

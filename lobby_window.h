@@ -1,20 +1,21 @@
 #pragma once
-#include <QMainWindow>
-#include <QLabel>
-#include <QScrollArea>
 #include <QPushButton>
 #include <QTimer>
-#include <QPainter>
-#include <QVBoxLayout>
 #include <QInputDialog>
 #include "application_window.h"
+#include "login_window.h"
+#include "game_window.h"
+#include "color.h"
 
 using namespace std::chrono_literals;
+class LoginWindow;
+class GameWindow;
 
 class LobbyWindow : public ApplicationWindow {
 public:
     LobbyWindow(Socket* socket, PlayerInfo& player, const QString& windowTitle);
-    void SetLoginWindow(ApplicationWindow* loginWindow);
+    void SetLoginWindow(LoginWindow* loginWindow);
+    void SetGameWindow(GameWindow* gameWindow);
 
 private:
     void Draw() override;
@@ -42,6 +43,8 @@ private:
     QLabel* infoLabel_ = nullptr;
     QTimer* searchingTimer_ = nullptr;
     uint timeInSearch_ = 0;
+    bool inSearch_ = false;
 
-    ApplicationWindow* loginWindow_ = nullptr;
+    LoginWindow* loginWindow_ = nullptr;
+    GameWindow* gameWindow_ = nullptr;
 };

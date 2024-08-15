@@ -1,18 +1,17 @@
 #pragma once
-#include <QMainWindow>
-#include <QScreen>
-#include <QApplication>
 #include <QPushButton>
-#include <QLabel>
-#include <QLineEdit>
-#include <QDebug>
 #include "auth_window.h"
+#include "registration_window.h"
+#include "lobby_window.h"
+
+class RegistrationWindow;
+class LobbyWindow;
 
 class LoginWindow : public AuthWindow {
 public:
     LoginWindow(Socket* socket, PlayerInfo& player, const QString& windowTitle);
-    void SetLobbyWindow(ApplicationWindow* lobby);
-    void SetRegisterWindow(ApplicationWindow* reg);
+    void SetLobbyWindow(LobbyWindow* lobby);
+    void SetRegisterWindow(RegistrationWindow* reg);
 
 private:
     void Draw() override;
@@ -26,6 +25,7 @@ private:
     QLabel* infoLabel_ = nullptr;
     QPushButton* registerButton_ = nullptr;
 
-    ApplicationWindow* lobbyWindow_ = nullptr;
-    ApplicationWindow* registrationWindow_ = nullptr;
+
+    LobbyWindow* lobbyWindow_ = nullptr;
+    RegistrationWindow* registrationWindow_ = nullptr;
 };
