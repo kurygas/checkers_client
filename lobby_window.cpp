@@ -114,7 +114,7 @@ void LobbyWindow::ReceiveStartGame(const Query& query) {
     Close();
     player_.enemyNickname = query.GetString(0);
     player_.enemyRating = query.GetInt(1);
-    player_.playerColor = query.GetId(2) == QueryId::White ? Color::white : Color::black;
+    player_.color = query.GetId(2) == QueryId::White ? Color::white : Color::black;
     gameWindow_->Open();
 }
 

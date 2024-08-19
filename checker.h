@@ -5,7 +5,14 @@
 
 class Checker : public QGraphicsEllipseItem {
 public:
-    Checker(const QColor& color, QGraphicsItem* parent, const QPair<uint, uint>& pos);
-    void ChangePos(const QPair<uint, uint>& pos);
+    using Pos = QPair<int, int>;
+
+    Checker(const QColor& color, QGraphicsItem* parent, const Pos& pos);
+    void ChangePos(const Pos& pos);
     const QColor& GetColor() const;
+    bool IsKing() const;
+    void MakeKing();
+
+private:
+    bool isKing_ = false;
 };

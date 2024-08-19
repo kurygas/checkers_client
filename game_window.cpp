@@ -10,16 +10,25 @@ void GameWindow::SetLobbyWindow(LobbyWindow* lobbyWindow) {
 void GameWindow::Draw() {
     ApplicationWindow::Draw();
 
+    myTurn_ = player_.color == Color::white;
+
     enemyNicknameLabel_ = new QLabel("Your enemy: " + player_.enemyNickname, centralWidget());
     layout_->addWidget(enemyNicknameLabel_);
 
     enemyRatingLabel_ = new QLabel("Enemy's rating: " + QString::number(player_.enemyRating), centralWidget());
     layout_->addWidget(enemyRatingLabel_);
 
-    board_ = new Board(centralWidget(), player_.playerColor);
+    colorLabel_ = new QLabel("Your color: " + QString(player_.color == Color::white ? "white" : "black"));
+    layout_->addWidget(colorLabel_);
+
+    board_ = new Board(centralWidget(), player_.color, this);
     layout_->addWidget(board_);
 }
 
 void GameWindow::ProcessMessage(const Query& query) {
 
+}
+
+bool GameWindow::IsMyTurn() const {
+    return myTurn_;
 }

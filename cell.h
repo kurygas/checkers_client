@@ -8,14 +8,19 @@ class Board;
 
 class Cell : public QGraphicsRectItem {
 public:
-    explicit Cell(const QPair<uint, uint>& pos, Board* board);
-    const QPair<uint, uint>& Pos() const;
+    using Pos = QPair<int, int>;
+
+    Cell(const Pos& pos, Board* board);
     void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
-    void SetChosen(bool state);
-    const Checker* GetChecker() const;
+    Checker* GetChecker();
+    void SetChosen();
+    void SetToMove();
+    void SetToBeat();
+    void ResetColor();
+    bool ToMove() const;
 
 private:
-    const QPair<uint, uint> pos_;
+    const Pos pos_;
     const QColor color_;
     Checker* checker_ = nullptr;
     Board* board_ = nullptr;

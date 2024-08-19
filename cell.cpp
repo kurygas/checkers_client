@@ -1,6 +1,6 @@
 #include "cell.h"
 
-Cell::Cell(const QPair<uint, uint>& pos, Board* board)
+Cell::Cell(const Pos& pos, Board* board)
 : QGraphicsRectItem(pos.first * 50, pos.second * 50, 50, 50)
 , pos_(pos)
 , color_((pos_.first + pos_.second) % 2 == 0 ? Color::beige : Color::brown)
@@ -17,18 +17,31 @@ Cell::Cell(const QPair<uint, uint>& pos, Board* board)
     }
 }
 
-const QPair<uint, uint>& Cell::Pos() const {
-    return pos_;
-}
-
 void Cell::mousePressEvent(QGraphicsSceneMouseEvent* event) {
     board_->CellPressed(pos_);
 }
 
-void Cell::SetChosen(const bool state) {
-    setBrush(state ? QColor(218, 165, 32) : color_);
+void Cell::SetChosen() {
+    setBrush(Color::green);
 }
 
-const Checker* Cell::GetChecker() const {
+Checker* Cell::GetChecker() {
     return checker_;
+}
+
+void Cell::SetToMove() {
+    setBrush(Color::yellow);
+}
+
+bool Cell::ToMove() const {
+    const auto currentColor = brush().color();
+    return currentColor == Color::red || currentColor == Color::yellow;
+}
+
+void Cell::SetToBeat() {
+    setBrush(Color::red);
+}
+
+void Cell::ResetColor() {
+    setBrush(color_);
 }

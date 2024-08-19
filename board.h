@@ -5,19 +5,33 @@
 #include <optional>
 #include "cell.h"
 #include "color.h"
+#include "game_window.h"
+#include "checker.h"
 
 class Cell;
+class GameWindow;
+class Checker;
 
 class Board : public QGraphicsView {
 public:
-    Board(QWidget* parent, const QColor& playerColor);
-    Cell* GetCell(const QPair<uint, uint>& pos);
-    void CellPressed(const QPair<uint, uint>& pos);
+    using Pos = QPair<int, int>;
+
+    Board(QWidget* parent, const QColor& playerColor, const GameWindow* gameWindow);
+    void CellPressed(const Pos& pos);
 
 private:
+    Cell* GetCell(const Pos& pos);
+    Checker* GetChecker(const Pos& pos);
+    bool CanBeatOther(const Pos& pos);
+    bool HaveBeatingMove();
+    void ShowAllMoves(const Pos& pos);
+    void ShowBeatingMoves(const Pos& pos);
+    void ResetCells();
+    static bool ValidPos(const Pos& pos);
+
     QGraphicsScene scene_;
-    std::optional<QPair<uint, uint>> chosenPos_;
+    std::optional<Pos> chosenPos_;
     QList<QList<Cell*>> grid_;
     const QColor& playerColor_;
-    bool myTurn_ = false;
+    const GameWindow* gameWindow_;
 };

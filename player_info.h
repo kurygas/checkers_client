@@ -6,5 +6,5 @@ struct PlayerInfo {
     QString newNickname;
     QString enemyNickname;
     uint enemyRating;
-    QColor playerColor;
+    QColor color;
 };
