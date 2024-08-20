@@ -32,3 +32,7 @@ void GameWindow::ProcessMessage(const Query& query) {
 bool GameWindow::IsMyTurn() const {
     return myTurn_;
 }
+
+void GameWindow::SendMove(const Pos& from, const Pos& to) {
+    myTurn_ = false;
+}

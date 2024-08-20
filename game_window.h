@@ -10,9 +10,13 @@ class Board;
 
 class GameWindow : public ApplicationWindow {
 public:
+    using Pos = QPair<int, int>;
+
     GameWindow(Socket* socket, PlayerInfo& player, const QString& windowTitle);
     void SetLobbyWindow(LobbyWindow* lobbyWindow);
     bool IsMyTurn() const;
+
+    void SendMove(const Pos& from, const Pos& to);
 
 private:
     void Draw() override;

@@ -18,6 +18,9 @@ public:
     void SetToBeat();
     void ResetColor();
     bool ToMove() const;
+    void SetChecker(Checker* checker);
+    const Pos& GetPos() const;
+    void RemoveChecker();
 
 private:
     const Pos pos_;

@@ -10,9 +10,9 @@ Cell::Cell(const Pos& pos, Board* board)
 
     if (color_ == Color::brown) {
         if (pos_.second < 3) {
-            checker_ = new Checker(Color::white, this, pos_);
+            checker_ = new Checker(Color::white, this);
         } else if (pos_.second > 4) {
-            checker_ = new Checker(Color::black, this, pos_);
+            checker_ = new Checker(Color::black, this);
         }
     }
 }
@@ -44,4 +44,17 @@ void Cell::SetToBeat() {
 
 void Cell::ResetColor() {
     setBrush(color_);
+}
+
+void Cell::SetChecker(Checker* checker) {
+    checker_ = checker;
+    checker->ChangeCell(this);
+}
+
+const Cell::Pos& Cell::GetPos() const {
+    return pos_;
+}
+
+void Cell::RemoveChecker() {
+    checker_ = nullptr;
 }

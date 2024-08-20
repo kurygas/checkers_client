@@ -16,7 +16,7 @@ class Board : public QGraphicsView {
 public:
     using Pos = QPair<int, int>;
 
-    Board(QWidget* parent, const QColor& playerColor, const GameWindow* gameWindow);
+    Board(QWidget* parent, const QColor& playerColor, GameWindow* gameWindow);
     void CellPressed(const Pos& pos);
 
 private:
@@ -27,11 +27,11 @@ private:
     void ShowAllMoves(const Pos& pos);
     void ShowBeatingMoves(const Pos& pos);
     void ResetCells();
-    static bool ValidPos(const Pos& pos);
+    QList<Board::Pos> PosToBeat(const Pos& pos);
 
     QGraphicsScene scene_;
     std::optional<Pos> chosenPos_;
     QList<QList<Cell*>> grid_;
     const QColor& playerColor_;
-    const GameWindow* gameWindow_;
+    GameWindow* gameWindow_;
 };

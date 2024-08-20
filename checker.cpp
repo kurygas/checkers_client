@@ -1,13 +1,15 @@
 #include "checker.h"
 
-Checker::Checker(const QColor& color, QGraphicsItem* parent, const Pos& pos)
-: QGraphicsEllipseItem(parent) {
+Checker::Checker(const QColor& color, Cell* parent)
+: QGraphicsEllipseItem(reinterpret_cast<QGraphicsItem*>(parent)) {
     setBrush(QBrush(color));
-    ChangePos(pos);
+    ChangeCell(parent);
 }
 
-void Checker::ChangePos(const Pos& pos) {
+void Checker::ChangeCell(Cell* cell) {
+    const auto& pos = cell->GetPos();
     setRect(pos.first * 50 + 5, pos.second * 50 + 5, 40, 40);
+    setParentItem(reinterpret_cast<QGraphicsItem*>(cell));
 }
 
 const QColor& Checker::GetColor() const {
