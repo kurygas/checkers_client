@@ -20,6 +20,8 @@ public:
     bool ToMove() const;
     void SetChecker(Checker* checker);
     const Pos& GetPos() const;
+    void ReleaseChecker();
+    bool ToBeat() const;
     void RemoveChecker();
 
 private:

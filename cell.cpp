@@ -34,8 +34,11 @@ void Cell::SetToMove() {
 }
 
 bool Cell::ToMove() const {
-    const auto currentColor = brush().color();
-    return currentColor == Color::red || currentColor == Color::yellow;
+    return brush().color() == Color::yellow;
+}
+
+bool Cell::ToBeat() const {
+    return brush().color() == Color::red;
 }
 
 void Cell::SetToBeat() {
@@ -55,6 +58,11 @@ const Cell::Pos& Cell::GetPos() const {
     return pos_;
 }
 
+void Cell::ReleaseChecker() {
+    checker_ = nullptr;
+}
+
 void Cell::RemoveChecker() {
+    delete checker_;
     checker_ = nullptr;
 }

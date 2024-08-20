@@ -16,12 +16,15 @@ public:
     void SetLobbyWindow(LobbyWindow* lobbyWindow);
     bool IsMyTurn() const;
 
-    void SendMove(const Pos& from, const Pos& to);
+    void SendMoves(const QList<QPair<Pos, Pos>>& moves);
+    void SendMatchResult();
 
 private:
     void Draw() override;
 
     void ProcessMessage(const Query& query) override;
+    void ReceiveMove(const Query& query);
+    void ReceiveDisconnect();
 
     QLabel* enemyNicknameLabel_ = nullptr;
     QLabel* enemyRatingLabel_ = nullptr;
