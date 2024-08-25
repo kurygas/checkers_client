@@ -54,7 +54,7 @@ void Cell::SetChecker(Checker* checker) {
     checker->ChangeCell(this);
 }
 
-const Cell::Pos& Cell::GetPos() const {
+const Pos& Cell::GetPos() const {
     return pos_;
 }
 

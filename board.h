@@ -14,15 +14,11 @@ class Checker;
 
 class Board : public QGraphicsView {
 public:
-    using Pos = QPair<int, int>;
-
     Board(QWidget* parent, const QColor& playerColor, GameWindow* gameWindow);
     void CellPressed(const Pos& pos);
     void MoveChecker(const Pos& from, const Pos& to);
-    static Board::Pos GetMiddlePos(const Pos& pos1, const Pos& pos2);
+    Pos GetBeatenPos(const Pos& pos1, const Pos& pos2);
     void RemoveChecker(const Pos& pos);
-    uint GetPlayerCount() const;
-    uint GetEnemyCount() const;
 
 private:
     Cell* GetCell(const Pos& pos);
@@ -32,7 +28,8 @@ private:
     void ShowAllMoves(const Pos& pos);
     void ShowBeatingMoves(const Pos& pos);
     void ResetCells();
-    QList<Board::Pos> PosToBeat(const Pos& pos);
+    QList<Pos> PosToBeat(const Pos& pos);
+    static bool IsValid(const Pos& pos);
 
     QGraphicsScene scene_;
     std::optional<Pos> chosenPos_;
@@ -40,6 +37,6 @@ private:
     const QColor& playerColor_;
     GameWindow* gameWindow_;
     QList<QPair<Pos, Pos>> movesToSend_;
-    uint playerCheckerCount = 12;
     uint enemyCheckerCount = 12;
+    const QList<Pos> moves_ = {{-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
 };

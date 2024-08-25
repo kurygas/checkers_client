@@ -42,6 +42,8 @@ add_executable(checkers_client main.cpp
         board.h
         player_info.h
         color.h
+        pos.cpp
+        pos.h
 )
 target_link_libraries(checkers_client
         Qt::Core

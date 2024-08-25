@@ -3,13 +3,12 @@
 #include <QBrush>
 #include <QPen>
 #include "cell.h"
+#include "pos.h"
 
 class Cell;
 
 class Checker : public QGraphicsEllipseItem {
 public:
-    using Pos = QPair<int, int>;
-
     Checker(const QColor& color, Cell* parent);
     void ChangeCell(Cell* cell);
     const QColor& GetColor() const;
@@ -18,4 +17,6 @@ public:
 
 private:
     bool isKing_ = false;
+    Cell* cell_;
+    QGraphicsEllipseItem* kingMark_ = nullptr;
 };

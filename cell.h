@@ -3,13 +3,12 @@
 #include <QBrush>
 #include "checker.h"
 #include "board.h"
+#include "pos.h"
 
 class Board;
 
 class Cell : public QGraphicsRectItem {
 public:
-    using Pos = QPair<int, int>;
-
     Cell(const Pos& pos, Board* board);
     void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     Checker* GetChecker();

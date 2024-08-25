@@ -37,6 +37,9 @@ void GameWindow::ProcessMessage(const Query& query) {
     else if (id == QueryId::EnemyDisconnected) {
         ReceiveDisconnect();
     }
+    else if (id == QueryId::Lose) {
+        ReceiveMatchResult();
+    }
 }
 
 bool GameWindow::IsMyTurn() const {
@@ -63,17 +66,31 @@ void GameWindow::ReceiveMove(const Query& query) {
     myTurn_ = true;
     turnLabel_->setText("Your turn");
 
-    for (uint i = 0; i < query.GetInt(0); ++i) {
+    for (uint i = 0; i < query.GetInt(0) * 4; i += 4) {
         const Pos from(query.GetInt(i + 1), query.GetInt(i + 2));
         const Pos to(query.GetInt(i + 3), query.GetInt(i + 4));
         board_->MoveChecker(from, to);
-
-        if (abs(from.first - to.first) > 1) {
-            board_->RemoveChecker(Board::GetMiddlePos(from, to));
-        }
     }
 }
 
 void GameWindow::SendMatchResult() {
     socket_->Write(Query(QueryId::Win));
+    ShowInfo("You have won your enemy and earned 50 points");
+    player_.rating += 50;
+    Close();
+    lobbyWindow_->Open();
+}
+
+void GameWindow::ReceiveDisconnect() {
+    ShowInfo("Your enemy has disconnected. You have earned 50 points");
+    player_.rating += 50;
+    Close();
+    lobbyWindow_->Open();
+}
+
+void GameWindow::ReceiveMatchResult() {
+    ShowInfo("You have lost 50 points after this match");
+    player_.rating += 50;
+    Close();
+    lobbyWindow_->Open();
 }

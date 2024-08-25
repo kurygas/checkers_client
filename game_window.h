@@ -4,14 +4,13 @@
 #include "application_window.h"
 #include "board.h"
 #include "lobby_window.h"
+#include "pos.h"
 
 class LobbyWindow;
 class Board;
 
 class GameWindow : public ApplicationWindow {
 public:
-    using Pos = QPair<int, int>;
-
     GameWindow(Socket* socket, PlayerInfo& player, const QString& windowTitle);
     void SetLobbyWindow(LobbyWindow* lobbyWindow);
     bool IsMyTurn() const;
@@ -25,6 +24,7 @@ private:
     void ProcessMessage(const Query& query) override;
     void ReceiveMove(const Query& query);
     void ReceiveDisconnect();
+    void ReceiveMatchResult();
 
     QLabel* enemyNicknameLabel_ = nullptr;
     QLabel* enemyRatingLabel_ = nullptr;
