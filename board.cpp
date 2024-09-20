@@ -8,20 +8,20 @@ Board::Board(QWidget* parent, const QColor& playerColor, GameWindow* gameWindow)
 , gameWindow_(gameWindow) {
     setScene(&scene_);
 
-    for (int i = 0; i < 8; ++i) {
-        for (int j = 0; j < 8; ++j) {
+    for (auto i = 0; i < 8; ++i) {
+        for (auto j = 0; j < 8; ++j) {
             grid_[j][i] = new Cell({j, i}, this);
             scene_.addItem(grid_[j][i]);
         }
     }
 }
 
-Cell* Board::GetCell(const Pos& pos) {
+Cell* Board::getCell(const Pos& pos) {
     return grid_[pos.first][pos.second];
 }
 
-void Board::CellPressed(const Pos& pos) {
-    if (!gameWindow_->IsMyTurn()) {
+void Board::cellPressed(const Pos& pos) {
+    if (!gameWindow_->isMyTurn()) {
         return;
     }
 
@@ -29,68 +29,68 @@ void Board::CellPressed(const Pos& pos) {
         return;
     }
 
-    auto* pressedCell = GetCell(pos);
+    auto* pressedCell = getCell(pos);
 
-    if (pressedCell->ToMove()) {
+    if (pressedCell->toMove()) {
         const auto& checkerPos = chosenPos_.value();
-        MoveChecker(checkerPos, pos);
+        moveChecker(checkerPos, pos);
         movesToSend_.emplace_back(checkerPos, pos);
-        ResetCells();
-        gameWindow_->SendMoves(movesToSend_);
+        resetCells();
+        gameWindow_->sendMoves(movesToSend_);
         movesToSend_.clear();
     }
-    else if (pressedCell->ToBeat()) {
+    else if (pressedCell->toBeat()) {
         const auto& checkerPos = chosenPos_.value();
-        MoveChecker(checkerPos, pos);
+        moveChecker(checkerPos, pos);
         movesToSend_.emplace_back(checkerPos, pos);
-        ResetCells();
+        resetCells();
 
-        if (!PosToBeat(pos).empty()) {
+        if (!posToBeat(pos).empty()) {
             chosenPos_ = pos;
-            GetCell(pos)->SetChosen();
-            ShowBeatingMoves(pos);
+            getCell(pos)->setChosen();
+            showBeatingMoves(pos);
         }
         else {
-            gameWindow_->SendMoves(movesToSend_);
+            gameWindow_->sendMoves(movesToSend_);
             movesToSend_.clear();
 
-            if (enemyCheckerCount == 0) {
-                gameWindow_->SendMatchResult();
+            if (enemyCheckerCount_ == 11) {
+                gameWindow_->sendMatchResult();
             }
         }
     }
     else {
-        ResetCells();
+        resetCells();
 
-        if (GetChecker(pos) && GetChecker(pos)->GetColor() == playerColor_) {
+        if (getChecker(pos) && getChecker(pos)->getColor() == playerColor_) {
             chosenPos_ = pos;
-            pressedCell->SetChosen();
+            pressedCell->setChosen();
 
-            if (HaveBeatingMove()) {
-                ShowBeatingMoves(pos);
+            if (haveBeatingMove()) {
+                showBeatingMoves(pos);
             }
             else {
-                ShowAllMoves(pos);
+                showAllMoves(pos);
             }
         }
     }
 
 }
 
-Checker* Board::GetChecker(const Pos& pos) {
-    return GetCell(pos)->GetChecker();
+Checker* Board::getChecker(const Pos& pos) {
+    return getCell(pos)->getChecker();
 }
 
-bool Board::CanBeatOther(const Pos& pos) {
-    return !PosToBeat(pos).empty();
+bool Board::canBeatOther(const Pos& pos) {
+    return !posToBeat(pos).empty();
 }
 
-bool Board::HaveBeatingMove() {
-    for (int i = 0; i < 8; ++i) {
-        for (int j = 0; j < 8; ++j) {
-            const auto* checker = GetChecker({i, j});
+bool Board::haveBeatingMove() {
+    for (auto i = 0; i < 8; ++i) {
+        for (auto j = 0; j < 8; ++j) {
+            const auto* checker = getChecker({i, j});
 
-            if (checker && checker->GetColor() == playerColor_ && CanBeatOther({i, j})) {
+            if (checker && checker->getColor() == playerColor_ && canBeatOther({i, j})) {
                 return true;
             }
         }
@@ -99,20 +99,20 @@ bool Board::HaveBeatingMove() {
     return false;
 }
 
-void Board::ShowBeatingMoves(const Pos& pos) {
-    for (const auto& move : PosToBeat(pos)) {
-        GetCell(move)->SetToBeat();
+void Board::showBeatingMoves(const Pos& pos) {
+    for (const auto& move : posToBeat(pos)) {
+        getCell(move)->setToBeat();
     }
 }
 
-void Board::ShowAllMoves(const Pos& pos) {
-    ShowBeatingMoves(pos);
+void Board::showAllMoves(const Pos& pos) {
+    showBeatingMoves(pos);
 
-    if (GetChecker(pos)->IsKing()) {
+    if (getChecker(pos)->isKing()) {
         for (const auto& move : moves_) {
-            for (Pos to = pos + move; IsValid(to); to += move) {
-                if (!GetChecker(to)) {
-                    GetCell(to)->SetToMove();
+            for (Pos to = pos + move; isValid(to); to += move) {
+                if (!getChecker(to)) {
+                    getCell(to)->setToMove();
                 }
                 else {
                     break;
@@ -123,36 +123,36 @@ void Board::ShowAllMoves(const Pos& pos) {
     else {
         for (const auto& move : moves_) {
             const auto to = pos + move;
-            if (IsValid(to) && !GetChecker(to) && (move.second == 1 && playerColor_ == Color::white ||
+            if (isValid(to) && !getChecker(to) && (move.second == 1 && playerColor_ == Color::white ||
             move.second == -1 && playerColor_ == Color::black)) {
-                GetCell(to)->SetToMove();
+                getCell(to)->setToMove();
             }
         }
     }
 }
 
-void Board::ResetCells() {
-    for (int i = 0; i < 8; ++i) {
-        for (int j = 0; j < 8; ++j) {
-            GetCell({i, j})->ResetColor();
+void Board::resetCells() {
+    for (auto i = 0; i < 8; ++i) {
+        for (auto j = 0; j < 8; ++j) {
+            getCell({i, j})->resetColor();
         }
     }
 
     chosenPos_.reset();
 }
 
-QList<Pos> Board::PosToBeat(const Pos& pos) {
+QList<Pos> Board::posToBeat(const Pos& pos) {
     QList<Pos> result;
 
-    if (GetChecker(pos)->IsKing()) {
+    if (getChecker(pos)->isKing()) {
         for (const auto& move : moves_) {
             bool metChecker = false;
 
-            for (Pos to = pos + move; IsValid(to); to += move) {
-                const auto* checker = GetChecker(to);
+            for (Pos to = pos + move; isValid(to); to += move) {
+                const auto* checker = getChecker(to);
 
                 if (checker) {
-                    if (metChecker || checker->GetColor() == playerColor_) {
+                    if (metChecker || checker->getColor() == playerColor_) {
                         break;
                     }
                     else {
@@ -169,10 +169,10 @@ QList<Pos> Board::PosToBeat(const Pos& pos) {
         for (const auto& move : moves_) {
             const auto to = pos + move;
 
-            if (IsValid(to + move)) {
-                const auto* checker = GetChecker(to);
+            if (isValid(to + move)) {
+                const auto* checker = getChecker(to);
 
-                if (checker && !GetChecker(to + move) && checker->GetColor() != playerColor_) {
+                if (checker && !getChecker(to + move) && checker->getColor() != playerColor_) {
                     result.emplace_back(to + move);
                 }
             }
@@ -182,27 +182,27 @@ QList<Pos> Board::PosToBeat(const Pos& pos) {
     return result;
 }
 
-void Board::MoveChecker(const Pos& from, const Pos& to) {
-    GetChecker(from)->ChangeCell(GetCell(to));
-    GetCell(to)->SetChecker(GetChecker(from));
-    GetCell(from)->ReleaseChecker();
-    const auto& color = GetChecker(to)->GetColor();
+void Board::moveChecker(const Pos& from, const Pos& to) {
+    getChecker(from)->changeCell(getCell(to));
+    getCell(to)->setChecker(getChecker(from));
+    getCell(from)->releaseChecker();
+    const auto& color = getChecker(to)->getColor();
 
     if (to.second == 7 && color == Color::white || to.second == 0 && color == Color::black) {
-        GetChecker(to)->MakeKing();
+        getChecker(to)->makeKing();
     }
 
-    if (GetChecker(GetBeatenPos(from, to))) {
-        RemoveChecker(GetBeatenPos(from, to));
+    if (getChecker(getBeatenPos(from, to))) {
+        removeChecker(getBeatenPos(from, to));
     }
 }
 
-Pos Board::GetBeatenPos(const Pos& pos1, const Pos& pos2) {
+Pos Board::getBeatenPos(const Pos& pos1, const Pos& pos2) {
     auto diff = pos1 - pos2;
-    diff.Normalize();
+    diff.normalize();
 
     for (Pos p = pos2 + diff; p != pos1; p += diff) {
-        if (GetChecker(p)) {
+        if (getChecker(p)) {
             return p;
         }
     }
@@ -210,14 +210,14 @@ Pos Board::GetBeatenPos(const Pos& pos1, const Pos& pos2) {
     return {0, 0};
 }
 
-void Board::RemoveChecker(const Pos& pos) {
-    if (GetChecker(pos)->GetColor() != playerColor_) {
-        --enemyCheckerCount;
+void Board::removeChecker(const Pos& pos) {
+    if (getChecker(pos)->getColor() != playerColor_) {
+        --enemyCheckerCount_;
     }
 
-    GetCell(pos)->RemoveChecker();
+    getCell(pos)->removeChecker();
 }
 
-bool Board::IsValid(const Pos& pos) {
+bool Board::isValid(const Pos& pos) {
     return pos.first >= 0 && pos.first < 8 && pos.second >= 0 && pos.second < 8;
 }

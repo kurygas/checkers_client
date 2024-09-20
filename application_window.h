@@ -1,31 +1,34 @@
 #pragma once
+
 #include <QMainWindow>
 #include <QVBoxLayout>
 #include <QLabel>
+
 #include "socket.h"
 #include "player_info.h"
 
 class ApplicationWindow : public QMainWindow {
 public:
-    ApplicationWindow(Socket* socket, PlayerInfo& player, const QString& windowTitle);
+    ApplicationWindow(Socket* socket, PlayerInfo& playerInfo, const QString& windowTitle);
 
-    void Open();
-    void Close();
+    void openWindow();
+    void closeWindow();
 
 protected:
-    virtual void Draw();
+    virtual void drawWindow();
+    void changeWindow(ApplicationWindow* newWindow);
 
-    virtual void ProcessMessage(const Query& message) = 0;
+    virtual void processMessage(const Query& message) = 0;
 
-    static void ShowError(const QString& text);
-    static void ShowInfo(const QString& text);
-    static bool CheckNickname(const QString& nickname);
-    static bool CheckPassword(const QString& password);
+    static void showError(const QString& text);
+    static void showInfo(const QString& text);
+    static bool checkNickname(const QString& nickname);
+    static bool checkPassword(const QString& password);
 
     Socket* socket_;
-    PlayerInfo& player_;
+    PlayerInfo& playerInfo_;
     QVBoxLayout* layout_ = nullptr;
 
 private:
-    void ReceiveMessage();
+    void receiveMessage();
 };

@@ -16,7 +16,7 @@ bool Pos::operator==(const Pos& other) const {
     return first == other.first && second == other.second;
 }
 
-void Pos::Normalize() {
+void Pos::normalize() {
     first /= std::abs(first);
     second /= std::abs(second);
 }

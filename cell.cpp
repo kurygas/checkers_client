@@ -18,51 +18,51 @@ Cell::Cell(const Pos& pos, Board* board)
 }
 
 void Cell::mousePressEvent(QGraphicsSceneMouseEvent* event) {
-    board_->CellPressed(pos_);
+    board_->cellPressed(pos_);
 }
 
-void Cell::SetChosen() {
+void Cell::setChosen() {
     setBrush(Color::green);
 }
 
-Checker* Cell::GetChecker() {
+Checker* Cell::getChecker() {
     return checker_;
 }
 
-void Cell::SetToMove() {
+void Cell::setToMove() {
     setBrush(Color::yellow);
 }
 
-bool Cell::ToMove() const {
+bool Cell::toMove() const {
     return brush().color() == Color::yellow;
 }
 
-bool Cell::ToBeat() const {
+bool Cell::toBeat() const {
     return brush().color() == Color::red;
 }
 
-void Cell::SetToBeat() {
+void Cell::setToBeat() {
     setBrush(Color::red);
 }
 
-void Cell::ResetColor() {
+void Cell::resetColor() {
     setBrush(color_);
 }
 
-void Cell::SetChecker(Checker* checker) {
+void Cell::setChecker(Checker* checker) {
     checker_ = checker;
-    checker->ChangeCell(this);
+    checker->changeCell(this);
 }
 
-const Pos& Cell::GetPos() const {
+const Pos& Cell::getPos() const {
     return pos_;
 }
 
-void Cell::ReleaseChecker() {
+void Cell::releaseChecker() {
     checker_ = nullptr;
 }
 
-void Cell::RemoveChecker() {
+void Cell::removeChecker() {
     delete checker_;
     checker_ = nullptr;
 }

@@ -1,4 +1,5 @@
 #pragma once
+
 #include <QPushButton>
 #include "auth_window.h"
 #include "login_window.h"
@@ -7,16 +8,17 @@ class LoginWindow;
 
 class RegistrationWindow : public AuthWindow {
 public:
-    explicit RegistrationWindow(Socket* socket, PlayerInfo& player, const QString& windowTitle);
-    void SetLoginWindow(LoginWindow* login);
+    explicit RegistrationWindow(Socket* socket, PlayerInfo& playerInfo, const QString& windowTitle);
+
+    void setLoginWindow(LoginWindow* login);
 
 private:
-    void Draw() override;
-    void OpenLogin();
+    void drawWindow() override;
+    void openLogin();
 
-    void ProcessMessage(const Query& query) override;
-    void SendRegister();
-    void ReceiveRegister(const Query& query);
+    void processMessage(const Query& query) override;
+    void sendRegister();
+    void receiveRegister(const Query& query);
 
     QPushButton* registerButton_ = nullptr;
     QLabel* infoLabel_ = nullptr;

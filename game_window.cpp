@@ -1,21 +1,21 @@
 #include "game_window.h"
 
-GameWindow::GameWindow(Socket* socket, PlayerInfo& player, const QString& windowTitle)
-: ApplicationWindow(socket, player, windowTitle) {}
+GameWindow::GameWindow(Socket* socket, PlayerInfo& playerInfo, const QString& windowTitle)
+: ApplicationWindow(socket, playerInfo, windowTitle) {}
 
-void GameWindow::SetLobbyWindow(LobbyWindow* lobbyWindow) {
+void GameWindow::setLobbyWindow(LobbyWindow* lobbyWindow) {
     lobbyWindow_ = lobbyWindow;
 }
 
-void GameWindow::Draw() {
-    ApplicationWindow::Draw();
+void GameWindow::drawWindow() {
+    ApplicationWindow::drawWindow();
 
-    myTurn_ = player_.color == Color::white;
+    myTurn_ = playerInfo_.color == Color::white;
 
-    enemyNicknameLabel_ = new QLabel("Your enemy: " + player_.enemyNickname, centralWidget());
+    enemyNicknameLabel_ = new QLabel("Your enemy: " + playerInfo_.enemyNickname, centralWidget());
     layout_->addWidget(enemyNicknameLabel_);
 
-    enemyRatingLabel_ = new QLabel("Enemy's rating: " + QString::number(player_.enemyRating), centralWidget());
+    enemyRatingLabel_ = new QLabel("Enemy's rating: " + QString::number(playerInfo_.enemyRating), centralWidget());
     layout_->addWidget(enemyRatingLabel_);
 
     colorLabel_ = new QLabel("Your color: " + QString(myTurn_ ? "white" : "black"), centralWidget());
@@ -24,73 +24,70 @@ void GameWindow::Draw() {
     turnLabel_ = new QLabel(myTurn_ ? "Your turn" : "Enemy turn", centralWidget());
     layout_->addWidget(turnLabel_);
 
-    board_ = new Board(centralWidget(), player_.color, this);
+    board_ = new Board(centralWidget(), playerInfo_.color, this);
     layout_->addWidget(board_);
 }
 
-void GameWindow::ProcessMessage(const Query& query) {
-    const auto id = query.Type();
+void GameWindow::processMessage(const Query& query) {
+    const auto id = query.getType();
 
     if (id == QueryId::Move) {
-        ReceiveMove(query);
+        receiveMove(query);
     }
     else if (id == QueryId::EnemyDisconnected) {
-        ReceiveDisconnect();
+        receiveDisconnect();
     }
     else if (id == QueryId::Lose) {
-        ReceiveMatchResult();
+        receiveMatchResult();
     }
 }
 
-bool GameWindow::IsMyTurn() const {
+bool GameWindow::isMyTurn() const {
     return myTurn_;
 }
 
-void GameWindow::SendMoves(const QList<QPair<Pos, Pos>>& moves) {
+void GameWindow::sendMoves(const QList<QPair<Pos, Pos>>& moves) {
     myTurn_ = false;
     turnLabel_->setText("Enemy turn");
     Query query(QueryId::Move);
-    query.PushInt(moves.size());
+    query.pushShort(moves.size());
 
     for (const auto& move : moves) {
-        query.PushInt(move.first.first);
-        query.PushInt(move.first.second);
-        query.PushInt(move.second.first);
-        query.PushInt(move.second.second);
+        query.pushShort(move.first.first);
+        query.pushShort(move.first.second);
+        query.pushShort(move.second.first);
+        query.pushShort(move.second.second);
     }
 
-    socket_->Write(query);
+    socket_->writeMessage(query);
 }
 
-void GameWindow::ReceiveMove(const Query& query) {
+void GameWindow::receiveMove(const Query& query) {
     myTurn_ = true;
     turnLabel_->setText("Your turn");
 
-    for (uint i = 0; i < query.GetInt(0) * 4; i += 4) {
-        const Pos from(query.GetInt(i + 1), query.GetInt(i + 2));
-        const Pos to(query.GetInt(i + 3), query.GetInt(i + 4));
-        board_->MoveChecker(from, to);
+    for (auto i = 0; i < query.getInt(0) * 4; i += 4) {
+        const Pos from(query.getInt(i + 1), query.getInt(i + 2));
+        const Pos to(query.getInt(i + 3), query.getInt(i + 4));
+        board_->moveChecker(from, to);
     }
 }
 
-void GameWindow::SendMatchResult() {
-    socket_->Write(Query(QueryId::Win));
-    ShowInfo("You have won your enemy and earned 50 points");
-    player_.rating += 50;
-    Close();
-    lobbyWindow_->Open();
+void GameWindow::sendMatchResult() {
+    socket_->writeMessage(Query(QueryId::Win));
+    showInfo("You have won your enemy and earned 50 points");
+    playerInfo_.rating += 50;
+    changeWindow(lobbyWindow_);
 }
 
-void GameWindow::ReceiveDisconnect() {
-    ShowInfo("Your enemy has disconnected. You have earned 50 points");
-    player_.rating += 50;
-    Close();
-    lobbyWindow_->Open();
+void GameWindow::receiveDisconnect() {
+    showInfo("Your enemy has disconnected. You have earned 50 points");
+    playerInfo_.rating += 50;
+    changeWindow(lobbyWindow_);
 }
 
-void GameWindow::ReceiveMatchResult() {
-    ShowInfo("You have lost 50 points after this match");
-    player_.rating += 50;
-    Close();
-    lobbyWindow_->Open();
+void GameWindow::receiveMatchResult() {
+    showInfo("You have lost 50 points after this match");
+    playerInfo_.rating -= std::min(50, playerInfo_.rating);
+    changeWindow(lobbyWindow_);
 }

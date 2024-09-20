@@ -1,10 +1,12 @@
+#pragma once
+
 #include <QString>
 
 struct PlayerInfo {
     QString nickname;
-    uint rating;
+    int rating;
     QString newNickname;
     QString enemyNickname;
-    uint enemyRating;
+    int enemyRating;
     QColor color;
 };

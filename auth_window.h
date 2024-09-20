@@ -4,11 +4,12 @@
 
 class AuthWindow : public ApplicationWindow {
 public:
-    AuthWindow(Socket* socket, PlayerInfo& player, const QString& windowTitle);
+    AuthWindow(Socket* socket, PlayerInfo& playerInfo, const QString& windowTitle);
 
 protected:
-    void Draw() override;
-    bool CheckBoxes() const;
+    void drawWindow() override;
+
+    bool checkBoxes() const;
 
     QLineEdit* nicknameBox_ = nullptr;
     QLineEdit* passwordBox_ = nullptr;

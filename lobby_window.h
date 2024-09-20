@@ -1,7 +1,9 @@
 #pragma once
+
 #include <QPushButton>
 #include <QTimer>
 #include <QInputDialog>
+
 #include "application_window.h"
 #include "login_window.h"
 #include "game_window.h"
@@ -14,24 +16,25 @@ class GameWindow;
 class LobbyWindow : public ApplicationWindow {
 public:
     LobbyWindow(Socket* socket, PlayerInfo& player, const QString& windowTitle);
-    void SetLoginWindow(LoginWindow* loginWindow);
-    void SetGameWindow(GameWindow* gameWindow);
+
+    void setLoginWindow(LoginWindow* loginWindow);
+    void setGameWindow(GameWindow* gameWindow);
 
 private:
-    void Draw() override;
-    void SearchLabelTimeout();
-    void EnableButtons(bool state);
+    void drawWindow() override;
+    void searchLabelTimeout();
+    void enableButtons(bool state);
 
-    void ProcessMessage(const Query& query) override;
-    void SendFindGame();
-    void ReceiveStartGame(const Query& query);
-    void SendCancelSearching();
-    void ReceiveCancelSearching();
-    void SendLogout();
-    void SendChangeNickname();
-    void ReceiveChangeNickname(const Query& query);
-    void SendChangePassword();
-    void ReceiveChangePassword(const Query& query);
+    void processMessage(const Query& query) override;
+    void sendFindGame();
+    void receiveStartGame(const Query& query);
+    void sendCancelSearching();
+    void receiveCancelSearching();
+    void sendLogout();
+    void sendChangeNickname();
+    void receiveChangeNickname(const Query& query);
+    void sendChangePassword();
+    void receiveChangePassword(const Query& query);
 
     QLabel* nicknameLabel_ = nullptr;
     QLabel* ratingLabel_ = nullptr;
@@ -42,7 +45,7 @@ private:
     QPushButton* cancelButton_ = nullptr;
     QLabel* infoLabel_ = nullptr;
     QTimer* searchingTimer_ = nullptr;
-    uint timeInSearch_ = 0;
+    int timeInSearch_ = 0;
     bool inSearch_ = false;
 
     LoginWindow* loginWindow_ = nullptr;

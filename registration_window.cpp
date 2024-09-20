@@ -1,13 +1,13 @@
 #include "registration_window.h"
 
-RegistrationWindow::RegistrationWindow(Socket* socket, PlayerInfo& player, const QString& windowTitle)
-: AuthWindow(socket, player, windowTitle) {}
+RegistrationWindow::RegistrationWindow(Socket* socket, PlayerInfo& playerInfo, const QString& windowTitle)
+: AuthWindow(socket, playerInfo, windowTitle) {}
 
-void RegistrationWindow::Draw() {
-    AuthWindow::Draw();
+void RegistrationWindow::drawWindow() {
+    AuthWindow::drawWindow();
 
     registerButton_ = new QPushButton("Register", centralWidget());
-    connect(registerButton_, &QPushButton::clicked, this, &RegistrationWindow::SendRegister);
+    connect(registerButton_, &QPushButton::clicked, this, &RegistrationWindow::sendRegister);
     layout_->addWidget(registerButton_);
 
     infoLabel_ = new QLabel("", centralWidget());
@@ -15,31 +15,30 @@ void RegistrationWindow::Draw() {
 
 
     backButton_ = new QPushButton("Back", centralWidget());
-    connect(backButton_, &QPushButton::clicked, this, &RegistrationWindow::OpenLogin);
+    connect(backButton_, &QPushButton::clicked, this, &RegistrationWindow::openLogin);
     layout_->addWidget(backButton_);
 }
 
-void RegistrationWindow::OpenLogin() {
-    Close();
-    loginWindow_->Open();
+void RegistrationWindow::openLogin() {
+    changeWindow(loginWindow_);
 }
 
-void RegistrationWindow::ProcessMessage(const Query& query) {
-    if (query.Type() == QueryId::Register) {
-        ReceiveRegister(query);
+void RegistrationWindow::processMessage(const Query& query) {
+    if (query.getType() == QueryId::Register) {
+        receiveRegister(query);
     }
 }
 
-void RegistrationWindow::ReceiveRegister(const Query& query) {
-    const auto result = query.GetId(0);
+void RegistrationWindow::receiveRegister(const Query& query) {
+    const auto result = query.getId(0);
 
     if (result == QueryId::Ok) {
-        ShowInfo("Successful registration");
-        OpenLogin();
+        showInfo("Successful registration");
+        openLogin();
         return;
     }
     else if (result == QueryId::AlreadyExist) {
-        ShowError("Login already exists");
+        showError("Login already exists");
     }
 
     infoLabel_->clear();
@@ -47,18 +46,18 @@ void RegistrationWindow::ReceiveRegister(const Query& query) {
     backButton_->setEnabled(true);
 }
 
-void RegistrationWindow::SendRegister() {
-    if (CheckBoxes()) {
+void RegistrationWindow::sendRegister() {
+    if (checkBoxes()) {
         Query query(QueryId::Register);
-        query.PushString(nicknameBox_->text());
-        query.PushString(passwordBox_->text());
-        socket_->Write(query);
+        query.pushString(nicknameBox_->text());
+        query.pushString(passwordBox_->text());
+        socket_->writeMessage(query);
         infoLabel_->setText("Please wait");
         registerButton_->setEnabled(false);
         backButton_->setEnabled(false);
     }
 }
 
-void RegistrationWindow::SetLoginWindow(LoginWindow* login) {
+void RegistrationWindow::setLoginWindow(LoginWindow* login) {
     loginWindow_ = login;
 }

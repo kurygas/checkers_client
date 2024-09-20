@@ -1,4 +1,5 @@
 #pragma once
+
 #include "socket.h"
 #include "login_window.h"
 #include "lobby_window.h"
@@ -10,7 +11,7 @@ public:
     Application(int argc, char* argv[]);
 
 private:
-    PlayerInfo player_;
+    PlayerInfo playerInfo_;
     Socket* socket_;
     LoginWindow loginWindow_;
     LobbyWindow lobbyWindow_;

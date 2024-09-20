@@ -1,8 +1,10 @@
 #pragma once
+
 #include <QGraphicsView>
 #include <QGraphicsGridLayout>
 #include <QGraphicsWidget>
 #include <optional>
+
 #include "cell.h"
 #include "color.h"
 #include "game_window.h"
@@ -15,21 +17,23 @@ class Checker;
 class Board : public QGraphicsView {
 public:
     Board(QWidget* parent, const QColor& playerColor, GameWindow* gameWindow);
-    void CellPressed(const Pos& pos);
-    void MoveChecker(const Pos& from, const Pos& to);
-    Pos GetBeatenPos(const Pos& pos1, const Pos& pos2);
-    void RemoveChecker(const Pos& pos);
+
+    void cellPressed(const Pos& pos);
+    void moveChecker(const Pos& from, const Pos& to);
+    Pos getBeatenPos(const Pos& pos1, const Pos& pos2);
+    void removeChecker(const Pos& pos);
 
 private:
-    Cell* GetCell(const Pos& pos);
-    Checker* GetChecker(const Pos& pos);
-    bool CanBeatOther(const Pos& pos);
-    bool HaveBeatingMove();
-    void ShowAllMoves(const Pos& pos);
-    void ShowBeatingMoves(const Pos& pos);
-    void ResetCells();
-    QList<Pos> PosToBeat(const Pos& pos);
-    static bool IsValid(const Pos& pos);
+    Cell* getCell(const Pos& pos);
+    Checker* getChecker(const Pos& pos);
+    bool canBeatOther(const Pos& pos);
+    bool haveBeatingMove();
+    void showAllMoves(const Pos& pos);
+    void showBeatingMoves(const Pos& pos);
+    void resetCells();
+    QList<Pos> posToBeat(const Pos& pos);
+
+    static bool isValid(const Pos& pos);
 
     QGraphicsScene scene_;
     std::optional<Pos> chosenPos_;
@@ -37,6 +41,6 @@ private:
     const QColor& playerColor_;
     GameWindow* gameWindow_;
     QList<QPair<Pos, Pos>> movesToSend_;
-    uint enemyCheckerCount = 12;
+    int enemyCheckerCount_ = 12;
     const QList<Pos> moves_ = {{-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
 };

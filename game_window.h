@@ -1,6 +1,8 @@
 #pragma once
+
 #include <QGridLayout>
 #include <QMouseEvent>
+
 #include "application_window.h"
 #include "board.h"
 #include "lobby_window.h"
@@ -11,20 +13,21 @@ class Board;
 
 class GameWindow : public ApplicationWindow {
 public:
-    GameWindow(Socket* socket, PlayerInfo& player, const QString& windowTitle);
-    void SetLobbyWindow(LobbyWindow* lobbyWindow);
-    bool IsMyTurn() const;
+    GameWindow(Socket* socket, PlayerInfo& playerInfo, const QString& windowTitle);
 
-    void SendMoves(const QList<QPair<Pos, Pos>>& moves);
-    void SendMatchResult();
+    void setLobbyWindow(LobbyWindow* lobbyWindow);
+    bool isMyTurn() const;
+
+    void sendMoves(const QList<QPair<Pos, Pos>>& moves);
+    void sendMatchResult();
 
 private:
-    void Draw() override;
+    void drawWindow() override;
 
-    void ProcessMessage(const Query& query) override;
-    void ReceiveMove(const Query& query);
-    void ReceiveDisconnect();
-    void ReceiveMatchResult();
+    void processMessage(const Query& query) override;
+    void receiveMove(const Query& query);
+    void receiveDisconnect();
+    void receiveMatchResult();
 
     QLabel* enemyNicknameLabel_ = nullptr;
     QLabel* enemyRatingLabel_ = nullptr;

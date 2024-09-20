@@ -1,62 +1,67 @@
 #include "application_window.h"
 
-ApplicationWindow::ApplicationWindow(Socket* socket, PlayerInfo& player, const QString& windowTitle)
+ApplicationWindow::ApplicationWindow(Socket* socket, PlayerInfo& playerInfo, const QString& windowTitle)
 : socket_(socket)
-, player_(player) {
+, playerInfo(playerInfo) {
     setWindowTitle(windowTitle);
-    connect(this, &QMainWindow::destroyed, socket_, &Socket::PrepareForClose);
+    connect(this, &QMainWindow::destroyed, socket_, &Socket::prepareForClose);
 }
 
-void ApplicationWindow::Open() {
-    connect(socket_, &QTcpSocket::readyRead, this, &ApplicationWindow::ReceiveMessage);
-    Draw();
+void ApplicationWindow::openWindow() {
+    connect(socket_, &QTcpSocket::readyRead, this, &ApplicationWindow::receiveMessage);
+    drawWindow();
     show();
 }
 
-void ApplicationWindow::Draw() {
+void ApplicationWindow::drawWindow() {
     setCentralWidget(new QWidget());
     layout_ = new QVBoxLayout(centralWidget());
     layout_->setAlignment(Qt::AlignHCenter);
 }
 
-void ApplicationWindow::Close() {
+void ApplicationWindow::closeWindow() {
     disconnect(socket_, &QTcpSocket::readyRead, nullptr, nullptr);
     takeCentralWidget()->deleteLater();
     hide();
 }
 
-void ApplicationWindow::ReceiveMessage() {
+void ApplicationWindow::receiveMessage() {
     if (!isHidden()) {
-        const auto& messages = socket_->Read();
+        const auto& messages = socket_->readMessage();
 
         for (const auto& message : messages) {
-            ProcessMessage(message);
+            processMessage(message);
         }
     }
 }
 
-void ApplicationWindow::ShowError(const QString& text) {
+void ApplicationWindow::showError(const QString& text) {
     QMessageBox::critical(nullptr, "Checkers Online", text);
 }
 
-void ApplicationWindow::ShowInfo(const QString& text) {
+void ApplicationWindow::showInfo(const QString& text) {
     QMessageBox::information(nullptr, "Checkers Online", text);
 }
 
-bool ApplicationWindow::CheckNickname(const QString& nickname) {
+bool ApplicationWindow::checkNickname(const QString& nickname) {
     if (nickname.size() < 3) {
-        ShowError("Nickname must contain at least 3 characters");
+        showError("Nickname must contain at least 3 characters");
         return false;
     }
 
     return true;
 }
 
-bool ApplicationWindow::CheckPassword(const QString &password) {
+bool ApplicationWindow::checkPassword(const QString &password) {
     if (password.size() < 6) {
-        ShowError("Password must contain at least 6 characters");
+        showError("Password must contain at least 6 characters");
         return false;
     }
 
     return true;
+}
+
+void ApplicationWindow::changeWindow(ApplicationWindow* newWindow) {
+    closeWindow();
+    newWindow->openWindow();
 }

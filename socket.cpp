@@ -2,41 +2,41 @@
 
 Socket::Socket(QApplication* parent)
 : QTcpSocket(parent) {
-    connect(this, &QTcpSocket::disconnected, this, &Socket::ConnectionLost);
+    connect(this, &QTcpSocket::disconnected, this, &Socket::connectionLost);
 }
 
-void Socket::ConnectToServer() {
+void Socket::connectToServer() {
     connectToHost(QHostAddress::LocalHost, 8080);
 
     if (!waitForConnected()) {
-        ConnectionLost();
+        connectionLost();
     }
 
-   connect(this, &QTcpSocket::disconnected, this, &Socket::ConnectionLost);
+   connect(this, &QTcpSocket::disconnected, this, &Socket::connectionLost);
 }
 
-void Socket::ConnectionLost() {
+void Socket::connectionLost() {
     QMessageBox::critical(nullptr, "Error", "Connection lost!");
     exit(0);
 }
 
-void Socket::PrepareForClose() {
+void Socket::prepareForClose() {
     disconnect(this, &QTcpSocket::disconnected, nullptr, nullptr);
 }
 
-void Socket::Write(const Query& message) {
-    write(message.ToBytes());
+void Socket::writeMessage(const Query& message) {
+    write(message.toBytes());
 }
 
-QList<Query> Socket::Read() {
+QList<Query> Socket::readMessage() {
     QList<Query> result;
     const auto data = readAll();
 
-    for (uint i = 0; i < data.size(); i += 2) {
+    for (auto i = 0; i < data.size(); i += 2) {
         QByteArray buffer;
         const auto querySize = (Query::ToInt(data[i]) << 8) + Query::ToInt(data[i + 1]);
 
-        for (uint j = 0; j < querySize; ++j) {
+        for (auto j = 0; j < querySize; ++j) {
             buffer.push_back(data[i + j + 2]);
         }
 
