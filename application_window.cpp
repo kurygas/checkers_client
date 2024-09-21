@@ -2,7 +2,7 @@
 
 ApplicationWindow::ApplicationWindow(Socket* socket, PlayerInfo& playerInfo, const QString& windowTitle)
 : socket_(socket)
-, playerInfo(playerInfo) {
+, playerInfo_(playerInfo) {
     setWindowTitle(windowTitle);
     connect(this, &QMainWindow::destroyed, socket_, &Socket::prepareForClose);
 }
@@ -16,7 +16,7 @@ void ApplicationWindow::openWindow() {
 void ApplicationWindow::drawWindow() {
     setCentralWidget(new QWidget());
     layout_ = new QVBoxLayout(centralWidget());
-    layout_->setAlignment(Qt::AlignHCenter);
+    layout_->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
 }
 
 void ApplicationWindow::closeWindow() {

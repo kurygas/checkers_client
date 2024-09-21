@@ -42,6 +42,7 @@ void LobbyWindow::drawWindow() {
     layout_->addWidget(cancelButton_);
 
     infoLabel_ = new QLabel(centralWidget());
+    infoLabel_->hide();
     layout_->addWidget(infoLabel_);
 
     searchingTimer_ = new QTimer(centralWidget());
@@ -74,6 +75,7 @@ void LobbyWindow::sendFindGame() {
     searchLabelTimeout();
     enableButtons(false);
     cancelButton_->show();
+    infoLabel_->show();
 }
 
 void LobbyWindow::searchLabelTimeout() {
@@ -103,12 +105,6 @@ void LobbyWindow::searchLabelTimeout() {
             socket_->writeMessage(query);
         }
     }
-    else {
-        enableButtons(true);
-        infoLabel_->clear();
-        timeInSearch_ = 0;
-        cancelButton_->hide();
-    }
 }
 
 void LobbyWindow::receiveStartGame(const Query& query) {
@@ -124,13 +120,17 @@ void LobbyWindow::sendCancelSearching() {
 
 void LobbyWindow::receiveCancelSearching() {
     inSearch_ = false;
+    enableButtons(true);
+    infoLabel_->clear();
+    timeInSearch_ = 0;
+    cancelButton_->hide();
+    infoLabel_->hide();
 }
 
 void LobbyWindow::enableButtons(const bool state) {
     changeNicknameButton_->setEnabled(state);
     changePasswordButton_->setEnabled(state);
     logoutButton_->setEnabled(state);
-    searchButton_->setEnabled(state);
 }
 
 void LobbyWindow::sendLogout() {

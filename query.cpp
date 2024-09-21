@@ -4,12 +4,12 @@ Query::Query(const QueryId queryId)
 : queryId_(queryId) {}
 
 Query::Query(const QByteArray& bytes)
-: queryId_(ToId(bytes.front())) {
+: queryId_(toId(bytes.front())) {
     for (auto i = 1; i < bytes.size(); ++i) {
-        const auto id = ToId(bytes[i]);
+        const auto id = toId(bytes[i]);
 
         if (id == QueryId::String) {
-            const auto stringSize = ToInt(bytes[i + 1]);
+            const auto stringSize = toInt(bytes[i + 1]);
             queryData_.emplace_back(Data::DataType::String, bytes.sliced(i + 2, stringSize));
             i += stringSize + 1;
         }
@@ -17,7 +17,7 @@ Query::Query(const QByteArray& bytes)
             auto result = 0;
 
             for (auto j = 0; j < 4; ++j) {
-                const auto byte = ToInt(bytes[i + j + 1]) << (8 * j);
+                const auto byte = toInt(bytes[i + j + 1]) << (8 * j);
                 result += byte;
             }
 
@@ -25,11 +25,11 @@ Query::Query(const QByteArray& bytes)
             i += 4;
         }
         else if (id == QueryId::Short) {
-            queryData_.emplace_back(Data::DataType::Short, ToInt(bytes[i + 1]));
+            queryData_.emplace_back(Data::DataType::Short, toInt(bytes[i + 1]));
             ++i;
         }
         else {
-            queryData_.emplace_back(Data::DataType::Id, ToInt(bytes[i]));
+            queryData_.emplace_back(Data::DataType::Id, toInt(bytes[i]));
         }
     }
 }
@@ -40,36 +40,36 @@ QueryId Query::getType() const {
 
 QByteArray Query::toBytes() const {
     QByteArray result;
-    result.push_back(ToChar(queryId_));
+    result.push_back(toChar(queryId_));
 
     for (const auto& data : queryData_) {
         if (data.dataType == Data::DataType::Id) {
-            result.push_back(ToChar(data.variant.toInt()));
+            result.push_back(toChar(data.variant.toInt()));
         }
         else if (data.dataType == Data::DataType::Int) {
             auto number = data.variant.toInt();
-            result.push_back(ToChar(QueryId::Int));
+            result.push_back(toChar(QueryId::Int));
 
             for (auto i = 0; i < 4; ++i) {
-                result.push_back(ToChar(number & 0xFF));
+                result.push_back(toChar(number & 0xFF));
                 number >>= 8;
             }
         }
         else if (data.dataType == Data::DataType::Short) {
-            result.push_back(ToChar(QueryId::Short));
-            result.push_back(ToChar(data.variant.toInt()));
+            result.push_back(toChar(QueryId::Short));
+            result.push_back(toChar(data.variant.toInt()));
         }
         else if (data.dataType == Data::DataType::String) {
             const auto& str = data.variant.toString();
-            result.push_back(ToChar(QueryId::String));
-            result.push_back(ToChar(str.size()));
+            result.push_back(toChar(QueryId::String));
+            result.push_back(toChar(str.size()));
             result.push_back(str.toUtf8());
         }
     }
 
     const auto querySize = result.size();
-    result.push_front(ToChar(querySize & 0xFF));
-    result.push_front(ToChar(querySize >> 8));
+    result.push_front(toChar(querySize & 0xFF));
+    result.push_front(toChar(querySize >> 8));
     return result;
 }
 
@@ -82,7 +82,7 @@ void Query::pushInt(const int data) {
 }
 
 void Query::pushId(const QueryId data) {
-    queryData_.emplace_back(Data::DataType::Id, ToInt(data));
+    queryData_.emplace_back(Data::DataType::Id, toInt(data));
 }
 
 void Query::pushShort(const int data) {
@@ -110,5 +110,5 @@ QString Query::getString(const int index) const {
 }
 
 QueryId Query::getId(const int index) const {
-    return ToId(queryData_[index].variant.toInt());
+    return toId(queryData_[index].variant.toInt());
 }

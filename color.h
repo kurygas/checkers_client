@@ -1,4 +1,5 @@
 #pragma once
+
 #include <QColor>
 
 namespace Color {
@@ -10,4 +11,6 @@ namespace Color {
     constexpr QColor yellow = {255, 255, 0};
     constexpr QColor green = {0, 255, 0};
     constexpr QColor blue = {0, 0, 255};
+
+    QColor negative(const QColor& color);
 };

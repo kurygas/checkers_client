@@ -34,7 +34,7 @@ QList<Query> Socket::readMessage() {
 
     for (auto i = 0; i < data.size(); i += 2) {
         QByteArray buffer;
-        const auto querySize = (Query::ToInt(data[i]) << 8) + Query::ToInt(data[i + 1]);
+        const auto querySize = (Query::toInt(data[i]) << 8) + Query::toInt(data[i + 1]);
 
         for (auto j = 0; j < querySize; ++j) {
             buffer.push_back(data[i + j + 2]);

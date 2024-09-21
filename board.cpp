@@ -54,7 +54,7 @@ void Board::cellPressed(const Pos& pos) {
             gameWindow_->sendMoves(movesToSend_);
             movesToSend_.clear();
 
-            if (enemyCheckerCount_ == 11) {
+            if (enemyCheckerCount_ == 0) {
                 gameWindow_->sendMatchResult();
             }
         }
@@ -123,8 +123,7 @@ void Board::showAllMoves(const Pos& pos) {
     else {
         for (const auto& move : moves_) {
             const auto to = pos + move;
-            if (isValid(to) && !getChecker(to) && (move.second == 1 && playerColor_ == Color::white ||
-            move.second == -1 && playerColor_ == Color::black)) {
+            if (isValid(to) && !getChecker(to) && move.second == -1) {
                 getCell(to)->setToMove();
             }
         }
@@ -220,4 +219,8 @@ void Board::removeChecker(const Pos& pos) {
 
 bool Board::isValid(const Pos& pos) {
     return pos.first >= 0 && pos.first < 8 && pos.second >= 0 && pos.second < 8;
+}
+
+const QColor& Board::getPlayerColor() const {
+    return playerColor_;
 }

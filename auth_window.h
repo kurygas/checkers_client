@@ -1,5 +1,7 @@
 #pragma once
+
 #include <QLineEdit>
+
 #include "application_window.h"
 
 class AuthWindow : public ApplicationWindow {

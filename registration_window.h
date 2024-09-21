@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QPushButton>
+
 #include "auth_window.h"
 #include "login_window.h"
 

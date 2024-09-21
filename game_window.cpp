@@ -50,13 +50,13 @@ void GameWindow::sendMoves(const QList<QPair<Pos, Pos>>& moves) {
     myTurn_ = false;
     turnLabel_->setText("Enemy turn");
     Query query(QueryId::Move);
-    query.pushShort(moves.size());
+    query.pushShort(static_cast<int>(moves.size()));
 
     for (const auto& move : moves) {
-        query.pushShort(move.first.first);
-        query.pushShort(move.first.second);
-        query.pushShort(move.second.first);
-        query.pushShort(move.second.second);
+        query.pushShort( 7 - move.first.first);
+        query.pushShort(7 - move.first.second);
+        query.pushShort(7 - move.second.first);
+        query.pushShort(7 - move.second.second);
     }
 
     socket_->writeMessage(query);

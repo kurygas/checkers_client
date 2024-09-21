@@ -58,17 +58,17 @@ public:
     QueryId getType() const;
 
     template<typename T>
-    static QueryId ToId(T data) {
+    static QueryId toId(T data) {
         return static_cast<QueryId>(static_cast<uint8_t>(data));
     }
 
     template<typename T>
-    static int ToInt(T data) {
+    static int toInt(T data) {
         return static_cast<int>(static_cast<uint8_t>(data));
     }
 
     template<typename T>
-    static char ToChar(T data) {
+    static char toChar(T data) {
         return static_cast<char>(static_cast<uint8_t>(data));
     }
 

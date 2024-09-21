@@ -23,6 +23,8 @@ public:
     Pos getBeatenPos(const Pos& pos1, const Pos& pos2);
     void removeChecker(const Pos& pos);
 
+    const QColor& getPlayerColor() const;
+
 private:
     Cell* getCell(const Pos& pos);
     Checker* getChecker(const Pos& pos);

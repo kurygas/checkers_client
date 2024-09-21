@@ -4,11 +4,11 @@ void AuthWindow::drawWindow() {
     ApplicationWindow::drawWindow();
 
     nicknameBox_ = new QLineEdit(centralWidget());
-    nicknameBox_->setPlaceholderText("getType your nickname");
+    nicknameBox_->setPlaceholderText("Type your nickname");
     layout_->addWidget(nicknameBox_);
 
     passwordBox_ = new QLineEdit(centralWidget());
-    passwordBox_->setPlaceholderText("getType your password");
+    passwordBox_->setPlaceholderText("Type your password");
     passwordBox_->setEchoMode(QLineEdit::Password);
     layout_->addWidget(passwordBox_);
 }

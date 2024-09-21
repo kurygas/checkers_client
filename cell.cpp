@@ -10,9 +10,10 @@ Cell::Cell(const Pos& pos, Board* board)
 
     if (color_ == Color::brown) {
         if (pos_.second < 3) {
-            checker_ = new Checker(Color::white, this);
-        } else if (pos_.second > 4) {
-            checker_ = new Checker(Color::black, this);
+            checker_ = new Checker(Color::negative(board_->getPlayerColor()), this);
+        }
+        else if (pos_.second > 4) {
+            checker_ = new Checker(board_->getPlayerColor(), this);
         }
     }
 }
