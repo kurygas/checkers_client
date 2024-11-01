@@ -14,6 +14,8 @@ public:
     void openWindow();
     void closeWindow();
 
+    ~ApplicationWindow() override = 0;
+
 protected:
     virtual void drawWindow();
     void changeWindow(ApplicationWindow* newWindow);

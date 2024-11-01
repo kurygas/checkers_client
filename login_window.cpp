@@ -41,6 +41,12 @@ void LoginWindow::receiveLogin(const Query& query) {
 
     if (result == QueryId::Ok) {
         playerInfo_.rating = query.getInt(1);
+        playerInfo_.friendList.resize(query.getInt(2));
+
+        for (auto i = 0; i < playerInfo_.friendList.size(); ++i) {
+            playerInfo_.friendList[i].nickname = query.getString(i + 2);
+        }
+
         closeWindow();
         lobbyWindow_->openWindow();
         return;

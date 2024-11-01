@@ -20,6 +20,8 @@ public:
     void setLoginWindow(LoginWindow* loginWindow);
     void setGameWindow(GameWindow* gameWindow);
 
+    ~LobbyWindow() override = default;
+
 private:
     void drawWindow() override;
     void searchLabelTimeout();

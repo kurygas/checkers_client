@@ -6,7 +6,7 @@ Socket::Socket(QApplication* parent)
 }
 
 void Socket::connectToServer() {
-    connectToHost(QHostAddress::LocalHost, 8080);
+    connectToHost(QHostAddress::LocalHost, 1234);
 
     if (!waitForConnected()) {
         connectionLost();

@@ -147,7 +147,7 @@ QList<Pos> Board::posToBeat(const Pos& pos) {
         for (const auto& move : moves_) {
             bool metChecker = false;
 
-            for (Pos to = pos + move; isValid(to); to += move) {
+            for (auto to = pos + move; isValid(to); to += move) {
                 const auto* checker = getChecker(to);
 
                 if (checker) {

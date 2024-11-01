@@ -8,6 +8,8 @@ class AuthWindow : public ApplicationWindow {
 public:
     AuthWindow(Socket* socket, PlayerInfo& playerInfo, const QString& windowTitle);
 
+    ~AuthWindow() override = default;
+
 protected:
     void drawWindow() override;
 

@@ -13,6 +13,8 @@ public:
 
     void setLoginWindow(LoginWindow* login);
 
+    ~RegistrationWindow() override = default;
+
 private:
     void drawWindow() override;
     void openLogin();

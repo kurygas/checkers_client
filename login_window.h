@@ -16,6 +16,8 @@ public:
     void setLobbyWindow(LobbyWindow* lobbyWindow);
     void setRegisterWindow(RegistrationWindow* registrationWindow);
 
+    ~LoginWindow() override = default;
+
 private:
     void drawWindow() override;
     void openRegistration();

@@ -21,6 +21,8 @@ public:
     void sendMoves(const QList<QPair<Pos, Pos>>& moves);
     void sendMatchResult();
 
+    ~GameWindow() override = default;
+
 private:
     void drawWindow() override;
 

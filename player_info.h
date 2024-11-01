@@ -2,6 +2,8 @@
 
 #include <QString>
 
+#include "friend_info.h"
+
 struct PlayerInfo {
     QString nickname;
     int rating;
@@ -9,4 +11,5 @@ struct PlayerInfo {
     QString enemyNickname;
     int enemyRating;
     QColor color;
+    QList<FriendInfo> friendList;
 };

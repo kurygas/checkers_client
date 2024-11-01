@@ -28,6 +28,8 @@ public:
     const Pos& getPos() const;
     bool toBeat() const;
 
+    ~Cell() override = default;
+
 private:
     const Pos pos_;
     const QColor color_;
